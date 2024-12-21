@@ -12,6 +12,7 @@ import CustomerDetails from "./pages/CustomerDetails";
 import AddCustomer from "./pages/AddCustomer";
 import AddTransaction from "./pages/AddTransaction";
 import GlobalStyles from "./styles/GlobalStyles";
+import AppLayout from "./ui/AppLayout";
 
 const App = () => {
   return (
@@ -19,17 +20,19 @@ const App = () => {
       <GlobalStyles />
       <BrowserRouter>
         <Routes>
-          <Route index element={<Navigate replace to="customers" />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route element={<AppLayout />}>
+            <Route index element={<Navigate replace to="customers" />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="account" element={<Account />} />
+            <Route path="stockOrderList" element={<StockOrderList />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="customerDetails" element={<CustomerDetails />} />
+            <Route path="addCustomer" element={<AddCustomer />} />
+            <Route path="addTransaction" element={<AddTransaction />} />
+          </Route>
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="account" element={<Account />} />
-          <Route path="stockOrderList" element={<StockOrderList />} />
-          <Route path="customers" element={<Customers />} />
-          <Route path="customerDetails" element={<CustomerDetails />} />
-          <Route path="addCustomer" element={<AddCustomer />} />
-          <Route path="addTransaction" element={<AddTransaction />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>

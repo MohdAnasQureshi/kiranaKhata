@@ -55,7 +55,10 @@ const GlobalStyles = createGlobalStyle`
     --image-grayscale: 0;
     --image-opacity: 100%;
   }
-  
+  a:focus::-webkit-focus-ring {
+  outline: none;
+}
+
   *,
   *::before,
   *::after {
