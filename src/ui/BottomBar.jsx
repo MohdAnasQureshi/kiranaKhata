@@ -10,6 +10,15 @@ const StyledBottomBar = styled.div`
   bottom: 0;
   width: 100vw;
   height: 65px;
+
+  @media (min-width: 1024px) {
+    height: 100vh;
+    left: 0px;
+    top: 60px;
+    width: 30vw;
+    padding: 3rem;
+    border-radius: var(--border-radius-lg);
+  }
 `;
 
 const BottomBar = () => {

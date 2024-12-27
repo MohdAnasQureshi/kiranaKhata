@@ -37,6 +37,7 @@ const GlobalStyles = createGlobalStyle`
     --color-indigo-700: #4338ca;
   
     --color-red-100: #fee2e2;
+    --color-red-500:#ff5555;
     --color-red-700: #b91c1c;
     --color-red-800: #991b1b;
   
@@ -55,9 +56,25 @@ const GlobalStyles = createGlobalStyle`
     --image-grayscale: 0;
     --image-opacity: 100%;
   }
-  a:focus::-webkit-focus-ring {
-  outline: none;
+
+*{
+   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
+
+ input,textarea,
+ button,
+ select,
+ a {
+     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+ }
+
+ a:focus,
+ a:visited,
+ a:active {
+     outline: none;
+ }
+  
 
   *,
   *::before,

@@ -10,6 +10,9 @@ const NavList = styled.ul`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  @media (min-width: 1024px) {
+    flex-direction: column;
+  }
 `;
 
 const StyledNavLink = styled(NavLink)`
@@ -55,15 +58,44 @@ const StyledNavLink = styled(NavLink)`
   &.active:visited svg {
     color: var(--color-brand-600);
   }
+  @media (min-width: 1024px) {
+    &:link,
+    :visited {
+      flex-direction: row;
+      justify-content: start;
+      gap: 4rem;
+      font-size: 1.8rem;
+      padding: 2rem;
+    }
+    & svg {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
 `;
 
 const StyledAddCustomer = styled(StyledNavLink)`
-  padding-top: 0px;
+  &:link,
+  :visited {
+    padding-top: 0px;
+  }
+
   & svg {
     color: var(--color-grey-600);
     height: 3.8rem;
     width: 3.8rem;
     transition: all 0.3s;
+  }
+  @media (min-width: 1024px) {
+    &:link,
+    :visited {
+      padding-top: 2rem;
+    }
+    & svg {
+      color: var(--color-grey-600);
+      height: 3rem;
+      width: 3rem;
+    }
   }
 `;
 
@@ -84,7 +116,7 @@ const MainNav = () => {
           </StyledNavLink>
         </li>
         <li>
-          <StyledAddCustomer to="/addCustomer" style={{ paddingTop: "0px" }}>
+          <StyledAddCustomer to="/addCustomer">
             <HiUserPlus />
             <span>Add Customer</span>
           </StyledAddCustomer>

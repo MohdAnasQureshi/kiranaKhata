@@ -14,8 +14,13 @@ const Main = styled.main`
   top: 50px;
   bottom: 65px;
   width: 100vw;
-  padding: 4rem 4.8rem 6.4rem;
+  padding: 2rem 2rem 2rem;
   overflow: scroll;
+  @media (min-width: 1024px) {
+    right: 0px;
+    bottom: 0px;
+    width: 70vw;
+  }
 `;
 
 const AppLayout = () => {
