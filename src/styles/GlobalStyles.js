@@ -2,6 +2,25 @@ import { createGlobalStyle } from "styled-components";
 
 const GlobalStyles = createGlobalStyle`
  :root {
+
+	--track-gradient: linear-gradient(
+		to bottom,
+		rgba(175, 48, 41, 1),
+		rgba(188, 82, 21, 1),
+		rgba(173, 131, 1, 1),
+		rgba(102, 128, 11, 1),
+		rgba(36, 131, 123, 1),
+		rgba(32, 94, 166, 1),
+		rgba(94, 64, 157, 1),
+		rgba(160, 47, 111, 1)
+	);
+
+	--bg: #100f0f;
+	--bg-2: #1c1b1a;
+	--ui: #282726;
+	--ui-2: #343331;
+	--tx: #cecdc3;
+
     /* Indigo */
     --color-brand-50: #eef2ff;
     --color-brand-100: #e0e7ff;
@@ -59,8 +78,37 @@ const GlobalStyles = createGlobalStyle`
 
 *{
    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+ 
+}
+::-webkit-scrollbar {
+  display: none; 
 }
 
+/* body{
+ overflow: hidden;
+} */
+
+.button {
+	background-color: var(--ui-2);
+	border: none;
+	border-radius: 50%;
+	color: #cecdc3;
+	cursor: pointer;
+}
+
+.button--up {
+	background-color:rgb(255, 13, 0);
+}
+.button--up:hover {
+	background-color: #d14d41;
+}
+
+.button--down {
+	background-color:rgb(252, 0, 143);
+}
+.button--down:hover {
+	background-color: #ce5d97;
+}
 
  input,textarea,
  button,

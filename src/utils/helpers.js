@@ -33,3 +33,49 @@ export const capitalizeFirstLetter = (word) => {
   if (!word) return "";
   return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 };
+
+// export const calculateMonthsAndDays = (startDate) => {
+//   const start = new Date(startDate);
+//   const now = new Date();
+
+//   const yearsDiff = now.getFullYear() - start.getFullYear();
+//   const monthsDiff = now.getMonth() - start.getMonth() + yearsDiff * 12;
+//   const daysDiff =
+//     now.getDate() >= start.getDate()
+//       ? now.getDate() - start.getDate()
+//       : new Date(now.getFullYear(), now.getMonth(), 0).getDate() -
+//         start.getDate() +
+//         now.getDate();
+
+//   return { months: monthsDiff, days: daysDiff, years: yearsDiff };
+// };
+//  1 years 1 months 16 days this code gave this error but only 16 days had passed corrected code :
+
+export const calculateMonthsAndDays = (startDate) => {
+  const start = new Date(startDate);
+  const now = new Date();
+
+  // Calculate the difference in years, months, and days.
+  let yearsDiff = now.getFullYear() - start.getFullYear();
+  let monthsDiff = now.getMonth() - start.getMonth();
+  let daysDiff = now.getDate() - start.getDate();
+
+  // If the current month is earlier than the start month, reduce the yearsDiff and monthsDiff
+  if (monthsDiff < 0) {
+    yearsDiff--;
+    monthsDiff += 12; // Adjust months to a positive number
+  }
+
+  // If the current day is earlier than the start day, adjust the days
+  if (daysDiff < 0) {
+    const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0); // Get last day of previous month
+    daysDiff = previousMonth.getDate() - start.getDate() + now.getDate();
+    monthsDiff--; // Decrease the month count since we're not at the start day yet
+    if (monthsDiff < 0) {
+      monthsDiff = 11; // Adjust months and years if necessary
+      yearsDiff--;
+    }
+  }
+
+  return { years: yearsDiff, months: monthsDiff, days: daysDiff };
+};

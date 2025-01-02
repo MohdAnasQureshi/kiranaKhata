@@ -15,7 +15,6 @@ const Main = styled.main`
   bottom: 65px;
   width: 100vw;
   padding: 2rem 2rem 2rem;
-  overflow: scroll;
   @media (min-width: 1024px) {
     right: 0px;
     bottom: 0px;
@@ -23,13 +22,25 @@ const Main = styled.main`
   }
 `;
 
+const Container = styled.div`
+  max-width: 120rem;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+`;
+
 const AppLayout = () => {
   return (
     <StyledAppLayout>
       <Header />
+
       <Main>
-        <Outlet />
+        <Container>
+          <Outlet />
+        </Container>
       </Main>
+
       <BottomBar />
     </StyledAppLayout>
   );

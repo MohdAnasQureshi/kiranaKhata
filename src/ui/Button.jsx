@@ -9,20 +9,20 @@ const sizes = {
     text-align: center;
   `,
   medium: css`
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     padding: 1.2rem 1.6rem;
     font-weight: 500;
   `,
   large: css`
-    font-size: 1.6rem;
-    padding: 1.2rem 2.4rem;
+    font-size: 1.9rem;
+    padding: 1rem 2.4rem;
     font-weight: 500;
   `,
 };
 
 const variations = {
   primary: css`
-    color: var(--color-brand-50);
+    color: white;
     background-color: var(--color-brand-600);
 
     &:hover {
@@ -58,8 +58,8 @@ const Button = styled.button`
 `;
 
 Button.defaultProps = {
-  variations: "primary",
-  size: "medium",
+  variation: "primary",
+  size: "large",
 };
 
 export default Button;

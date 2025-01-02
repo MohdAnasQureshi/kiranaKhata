@@ -1,7 +1,8 @@
 import React from "react";
+import AddCustomerForm from "../features/customers/AddCustomerForm";
 
 const AddCustomer = () => {
-  return <div>Add Customer</div>;
+  return <AddCustomerForm />;
 };
 
 export default AddCustomer;
