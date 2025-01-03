@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { getCustomers } from "../../services/apiCustomers";
 import Spinner from "../../ui/Spinner";
 import PageNotFound from "../../pages/PageNotFound";
 import styled from "styled-components";
@@ -10,6 +8,7 @@ import {
   formatCurrency,
 } from "../../utils/helpers";
 import ScrollBar from "../../ui/ScrollBar";
+import { useCustomers } from "./useCustomers";
 
 const CustomerDetailRow = styled.div`
   display: flex;
@@ -57,14 +56,7 @@ const CustomerStats = styled(CustomerDetailRow)`
 `;
 
 const CustomerRow = () => {
-  const {
-    isLoading,
-    data: customers,
-    error,
-  } = useQuery({
-    queryKey: ["customers"],
-    queryFn: getCustomers,
-  });
+  const { customers, error, isLoading } = useCustomers();
 
   console.log(customers, error);
 

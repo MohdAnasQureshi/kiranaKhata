@@ -16,7 +16,7 @@ function Dashboard() {
           height="50vh"
         >
           <p>This content is scrollable.</p>
-          <p>
+          <p style={{ textAlign: "justify" }}>
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. Explicabo
             dolorem est amet et at quam quisquam ea sequi facilis! Placeat non
             ducimus quos ipsum necessitatibus mollitia quo nobis, distinctio ea

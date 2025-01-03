@@ -1,12 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addCustomer } from "../../services/apiCustomers";
-import toast from "react-hot-toast";
+import { useAddCustomer } from "./useAddCustomer";
 // import FileInput from "../../ui/FileInput";
 // import Textarea from "../../ui/Textarea";
 
@@ -40,34 +38,45 @@ const Label = styled.label`
   font-size: 2rem;
 `;
 
-// const Error = styled.span`
-//   font-size: 1.4rem;
-//   color: var(--color-red-700);
-// `;
+const Error = styled.span`
+  font-size: 1.4rem;
+  color: var(--color-red-700);
+`;
 
 const AddCustomerForm = () => {
-  const { register, handleSubmit, reset } = useForm();
-  const queryClient = useQueryClient();
+  const { register, handleSubmit, reset, formState } = useForm();
+  const { errors } = formState;
+  const [serverErrorMessage, setServerErrorMessage] = useState("");
 
-  const { mutate, isLoading: isAdding } = useMutation({
-    mutationFn: addCustomer,
-    onSuccess: () => {
-      toast.success("New Customer added successfully");
-      queryClient.invalidateQueries({ queryKey: ["customers"] });
-      reset();
-    },
-    onError: (err) => toast.error(err.response.data.message),
-  });
+  const { mutate: addCustomer, isAdding } = useAddCustomer(
+    setServerErrorMessage,
+    reset
+  );
 
   function onAddCustomer(data) {
     console.log(data);
-    mutate(data);
+    addCustomer(data);
   }
+
+  function onError(errors) {
+    console.log(errors);
+  }
+
   return (
-    <Form onSubmit={handleSubmit(onAddCustomer)}>
+    <Form onSubmit={handleSubmit(onAddCustomer, onError)}>
       <FormRow>
         <Label htmlFor="customerName">Customer name</Label>
-        <Input type="text" id="customerName" {...register("customerName")} />
+        <Input
+          type="text"
+          id="customerName"
+          disabled={isAdding}
+          {...register("customerName", {
+            required: "Customer name is required",
+          })}
+        />
+        {(errors?.customerName?.message || serverErrorMessage) && (
+          <Error>{errors?.customerName?.message || serverErrorMessage}</Error>
+        )}
       </FormRow>
 
       <FormRow>
@@ -75,6 +84,7 @@ const AddCustomerForm = () => {
         <Input
           type="number"
           id="customerContact"
+          disabled={isAdding}
           {...register("customerContact")}
         />
       </FormRow>

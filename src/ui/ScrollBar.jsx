@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 const ScrollContainer = styled.div`
   position: relative;
   height: 100%;
-  overflow: hidden; /* Prevent default scrollbars */
+  overflow: auto; /* Prevent default scrollbars */
 `;
 
 const Content = styled.div`
@@ -13,8 +13,8 @@ const Content = styled.div`
   flex-direction: column;
   gap: 1rem;
   overflow: auto;
-  height: ${(height) => height};
-  padding-right: ${({ showButtons }) => (showButtons ? "1rem" : "0")};
+  height: ${(height) => height || "auto"};
+  padding-right: ${({ showbuttons }) => (showbuttons ? "1rem" : "0")};
 `;
 
 const Scroll = styled.div`
@@ -25,8 +25,8 @@ const Scroll = styled.div`
   width: 16px;
   z-index: 10; /* Ensures it overlays the content */
   display: grid;
-  grid-template: ${({ showButtons }) =>
-    showButtons ? "auto 1fr auto / 1fr" : "1fr / 1fr"};
+  grid-template: ${({ showbuttons }) =>
+    showbuttons ? "auto 1fr auto / 1fr" : "1fr / 1fr"};
   gap: 0.5rem;
   align-items: center;
 `;
@@ -42,7 +42,7 @@ const Track = styled.div`
   top: 0;
   bottom: 0;
   width: 100%;
-  background-color: ${(props) => props.backgroundColor};
+  background-color: ${(props) => props.$backgroundcolor};
   border-radius: 8px;
   cursor: pointer;
 `;
@@ -59,7 +59,30 @@ const Thumb = styled.div`
 
   &:active {
     cursor: grabbing;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--color-brand-700);
+  }
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+  }
+
+  &::before {
+    top: 8px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid white;
+  }
+
+  &::after {
+    bottom: 8px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white;
   }
 `;
 
@@ -140,6 +163,7 @@ const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
     if (content) {
       observer.current = new ResizeObserver(() => {
         handleResize();
+        handleThumbPosition();
       });
       observer.current.observe(content);
       content.addEventListener("scroll", handleThumbPosition, {
@@ -166,7 +190,7 @@ const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
         track.removeEventListener("touchstart", showThumb);
       };
     }
-  }, []);
+  }, [handleResize, handleThumbPosition]);
 
   function handleThumbMousedown(e) {
     e.preventDefault();
@@ -282,12 +306,15 @@ const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
         className="content"
         id="custom-scrollbars-content"
         ref={contentRef}
-        showButtons={showButtons}
+        showbuttons={showButtons ? "true" : undefined}
         height={height}
       >
         {children}
       </Content>
-      <Scroll className="scrollbar" showButtons={showButtons}>
+      <Scroll
+        className="scrollbar"
+        showbuttons={showButtons ? "true" : undefined}
+      >
         {showButtons && (
           <button
             className="button button--up"
@@ -307,7 +334,7 @@ const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
             ref={scrollTrackRef}
             onClick={handleTrackClick}
             onTouchStart={handleTrackClick}
-            backgroundColor={backgroundColor}
+            $backgroundcolor={backgroundColor}
             style={{
               cursor: isDragging ? "grabbing" : undefined,
             }}
@@ -316,7 +343,7 @@ const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
             className="thumb"
             ref={scrollThumbRef}
             onMouseDown={handleThumbMousedown}
-            isVisible={thumbVisible}
+            $isvisible={thumbVisible ? "true" : undefined}
             onTouchStart={handleThumbTouchStart}
             style={{
               height: `${thumbHeight}px`,
@@ -342,7 +369,6 @@ const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
 
 ScrollBar.propTypes = {
   children: PropTypes.node.isRequired,
-  props: PropTypes.node.isRequired,
   backgroundColor: PropTypes.node.isRequired,
   showButtons: PropTypes.node.isRequired,
   height: PropTypes.node.isRequired,
