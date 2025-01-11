@@ -9,6 +9,7 @@ import {
 } from "../../utils/helpers";
 import ScrollBar from "../../ui/ScrollBar";
 import { useCustomers } from "./useCustomers";
+import { useNavigate } from "react-router-dom";
 
 const CustomerDetailRow = styled.div`
   display: flex;
@@ -47,8 +48,8 @@ const TotalCustomers = styled.div`
 
 const CustomerStats = styled(CustomerDetailRow)`
   flex-direction: row;
-  background-color: var(--color-yellow-100);
-  color: var(--color-red-700);
+  background-color: var(--color-silver-100);
+  /* color: var(--color-red-700); */
   font-size: 1.4rem;
   justify-content: space-around;
   gap: 1rem;
@@ -56,9 +57,15 @@ const CustomerStats = styled(CustomerDetailRow)`
 `;
 
 const CustomerRow = () => {
-  const { customers, error, isLoading } = useCustomers();
+  const navigate = useNavigate();
+  const { customers, isLoading } = useCustomers();
 
-  console.log(customers, error);
+  const handleRowClick = (customerId, { customerName, customerContact }) => {
+    // Navigate to the transaction page, passing customer ID and name
+    navigate(`/addTransaction/${customerId}`, {
+      state: { customerName, customerContact },
+    });
+  };
 
   // Find the customer with the highest debt
   const customerWithHighestDebt = customers?.data?.reduce((max, customer) => {
@@ -67,13 +74,20 @@ const CustomerRow = () => {
       : max;
   }, customers.data[0]);
 
-  const oldestCustomerWithUnpaidDebt = customers?.data
-    ?.filter((customer) => customer.totalOutstandingDebt > 0)
-    ?.reduce((oldest, customer) => {
+  const filteredCustomers = customers?.data?.filter(
+    (customer) => customer.totalOutstandingDebt > 0
+  );
+
+  const oldestCustomerWithUnpaidDebt = filteredCustomers?.reduce(
+    (oldest, customer) => {
       return new Date(customer?.createdAt) < new Date(oldest?.createdAt)
         ? customer
         : oldest;
-    }, customers.data[0]);
+    },
+    filteredCustomers[0]
+  );
+
+  // console.log(oldestCustomerWithUnpaidDebt);
 
   const { months, days, years } = calculateMonthsAndDays(
     oldestCustomerWithUnpaidDebt?.createdAt
@@ -109,10 +123,20 @@ const CustomerRow = () => {
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
-        height="50vh"
+        height="60vh"
       >
         {customers.data.map((customer) => (
-          <CustomerDetailRow role="row" key={customer._id}>
+          <CustomerDetailRow
+            role="row"
+            key={customer._id}
+            onClick={() =>
+              handleRowClick(customer._id, {
+                customerName: customer.customerName,
+                customerContact: customer.customerContact,
+              })
+            }
+            style={{ cursor: "pointer" }}
+          >
             <Name>{capitalizeFirstLetter(customer.customerName)}</Name>
             <OutstandingDebt
               style={

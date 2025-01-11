@@ -41,7 +41,10 @@ const App = () => {
             <Route path="customers" element={<Customers />} />
             <Route path="customerDetails" element={<CustomerDetails />} />
             <Route path="addCustomer" element={<AddCustomer />} />
-            <Route path="addTransaction" element={<AddTransaction />} />
+            <Route
+              path="addTransaction/:customerId"
+              element={<AddTransaction />}
+            />
           </Route>
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />

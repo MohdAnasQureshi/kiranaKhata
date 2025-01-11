@@ -1,6 +1,23 @@
-import { formatDistance, parseISO } from "date-fns";
+import { formatDistance, parseISO, format } from "date-fns";
 import { differenceInDays } from "date-fns";
 
+export const formatDate = (date) => format(new Date(date), "PPpp");
+export const formatAndGetDate = (date) => {
+  const options = { day: "numeric", month: "short", year: "numeric" };
+  const formattedDate = new Date(date).toLocaleDateString("en-US", options);
+  const parts = formattedDate.split(" "); // e.g., "Jan 5, 2025" -> ["Jan", "5,", "2025"]
+  return `${parts[1]} ${parts[0]} ${parts[2]}`.replace(",", ""); // Rearrange and remove comma
+};
+
+export const formatAndSubtractOneDay = (dateString) => {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() - 1); // Subtract one day
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }); // Format as "1 Jan 2025"
+};
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1, dateStr2) =>
   differenceInDays(parseISO(String(dateStr1)), parseISO(String(dateStr2)));

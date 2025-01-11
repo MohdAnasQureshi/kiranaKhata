@@ -9,8 +9,7 @@ const StyledBottomBar = styled.div`
   position: fixed;
   bottom: 0;
   width: 100vw;
-  height: 65px;
-
+  height: var(--height-bottombar);
   @media (min-width: 1024px) {
     height: 100vh;
     left: 0px;

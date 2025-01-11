@@ -1,12 +1,12 @@
 import React from "react";
-// import AddStockList from "../features/stockLists/AddStockList";
+import AddStockList from "../features/stockLists/AddStockList";
 import StockLists from "../features/stockLists/StockLists";
 
 const StockOrderList = () => {
   return (
     <>
-      {/* <AddStockList /> */}
       <StockLists />
+      <AddStockList />
     </>
   );
 };

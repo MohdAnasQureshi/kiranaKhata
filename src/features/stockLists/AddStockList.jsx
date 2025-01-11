@@ -1,94 +1,131 @@
-import React from "react";
-// import { useForm } from "react-hook-form";
-import Form from "../../ui/Form";
+import React, { useRef, useState } from "react";
 import Button from "../../ui/Button";
 import styled from "styled-components";
 import { useAddStockList } from "./useAddStockList";
 import { useForm } from "react-hook-form";
 
-const Textarea = styled.textarea`
-  resize: none; /* Prevent resizing */
-  overflow: auto; /* Scrollbar appears when content overflows */
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 0.8rem 1.2rem;
-  font-size: 1.8rem;
-  border-color: var() (--color-grey-0);
-  box-shadow: var(--shadow-sm);
-`;
-
-const FormRow = styled.div`
+const StockListForm = styled.form`
+  position: fixed;
+  bottom: 65px;
+  background: none;
+  width: auto;
+  left: 10px;
+  right: 10px;
+  border: none;
+  margin: 1rem 0 1rem 0;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.2rem 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-
+  flex-direction: row;
+  gap: 1rem;
+  align-items: flex-end;
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
 
+  &:last-child {
+    flex-shrink: 0;
+  }
+
   &:has(button) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
+    gap: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    left: 31vw;
+    bottom: 20px;
+    max-width: 120rem;
+    margin: auto;
   }
 `;
 
-const Label = styled.label`
-  font-weight: 500;
+const Textarea = styled.textarea`
+  resize: none; /* Prevent resizing */
+  overflow: auto; /* Scrollbar appears when content overflows */
+  border: 1px solid #ddd;
+  border-radius: 20px;
   font-size: 2rem;
+  padding: 1rem;
+  border-color: var() (--color-grey-0);
+  box-shadow: var(--shadow-sm);
+  flex-grow: 1; /* Occupies the remaining space */
+  width: 70vw;
+  height: 5rem;
+  min-height: 5rem;
+  max-height: 18rem;
 `;
 
-const Error = styled.span`
-  font-size: 1.4rem;
-  color: var(--color-red-700);
-`;
+// const Error = styled.span`
+//   font-size: 1.4rem;
+//   color: var(--color-red-700);
+//   position: fixed;
+//   bottom: 130px;
+//   z-index: 3;
+//   @media (min-width: 1024px) {
+//     bottom: 85px;
+//   }
+// `;
 
 const AddStockList = () => {
-  const { register, handleSubmit, reset, formState } = useForm();
-  const { errors } = formState;
+  const { register, handleSubmit, reset } = useForm();
+  // const { errors } = formState;
 
-  const { mutate: addStockList, isAdding } = useAddStockList(reset);
+  const { mutate: addStockList, isAdding } = useAddStockList();
 
-  function onAddStockList(data) {
-    console.log(data);
-    addStockList(data);
-  }
+  const [value, setValue] = useState(""); // State to track textarea value
+  const textareaRef = useRef(null); // Ref for the textarea DOM element
+
+  const handleChange = (e) => {
+    setValue(e.target.value); // Update the value
+    adjustHeight(e.target); // Adjust height dynamically
+  };
+
+  const adjustHeight = (textarea) => {
+    textarea.style.height = "5rem"; // Reset height first
+    textarea.style.height = `${textarea.scrollHeight}px`; // Then adjust based on content
+  };
+
+  const [renderKey, setRenderKey] = useState(0); // Rename key to avoid conflict
+
+  const onAddStockList = (data) => {
+    console.log(data); // Log the form data
+
+    addStockList(data, {
+      onSuccess: () => {
+        setValue("");
+        reset();
+        setRenderKey((prevKey) => prevKey + 1); // Increment key to force re-render
+      },
+    });
+  };
 
   return (
     <>
-      <div>Add new stock list</div>
-      <Form onSubmit={handleSubmit(onAddStockList)}>
-        <FormRow>
-          <Label htmlFor="stockList">Stock List</Label>
-          <Textarea
-            type="textarea"
-            id="stockList"
-            rows={10}
-            cols={10}
-            disabled={isAdding}
-            placeholder="Start typing here..."
-            {...register("stockList", {
-              required: "No Stocks added",
-            })}
-          />
-          {errors?.stockList?.message && (
-            <Error>{errors?.stockList?.message}</Error>
-          )}
-        </FormRow>
-
-        <FormRow>
-          <Button disabled={isAdding}>Add List</Button>
-        </FormRow>
-      </Form>
+      <StockListForm key={renderKey} onSubmit={handleSubmit(onAddStockList)}>
+        <Textarea
+          ref={textareaRef}
+          value={value}
+          type="textarea"
+          id="stockList"
+          disabled={isAdding}
+          placeholder="Start typing here..."
+          {...register("stockList", {
+            required: "No Stocks added",
+            onChange: handleChange,
+          })}
+        />
+        <Button
+          style={{
+            borderRadius: "50px",
+            height: "5rem",
+            fontSize: "2rem",
+          }}
+          disabled={isAdding}
+        >
+          +
+        </Button>
+      </StockListForm>
+      {/* {errors?.stockList?.message && (
+        <Error>{errors?.stockList?.message}</Error>
+      )} */}
     </>
   );
 };

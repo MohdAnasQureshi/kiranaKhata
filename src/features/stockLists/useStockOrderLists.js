@@ -7,7 +7,7 @@ export function useStockOrderLists() {
     data: stockOrderLists,
     error,
   } = useQuery({
-    queryKey: ["stockorderlist"],
+    queryKey: ["stockorderlists"],
     queryFn: getStockOrderLists,
   });
 

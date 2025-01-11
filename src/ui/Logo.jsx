@@ -19,7 +19,7 @@ const Img = styled.img`
 function Logo() {
   return (
     <StyledLogo>
-      <Img src="./kiranakhata-logo.png" alt="Logo" />
+      <Img src="/kiranakhata-logo.png" alt="Logo" />
       <span>kiranaKhata</span>
     </StyledLogo>
   );

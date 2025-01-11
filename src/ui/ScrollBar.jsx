@@ -1,17 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
 const ScrollContainer = styled.div`
   position: relative;
   height: 100%;
-  overflow: auto; /* Prevent default scrollbars */
 `;
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  flex-grow: 1;
   overflow: auto;
   height: ${(height) => height || "auto"};
   padding-right: ${({ showbuttons }) => (showbuttons ? "1rem" : "0")};
@@ -86,291 +92,314 @@ const Thumb = styled.div`
   }
 `;
 
-const ScrollBar = ({ children, backgroundColor, showButtons, height }) => {
-  const contentRef = useRef(null);
-  const scrollTrackRef = useRef(null);
-  const scrollThumbRef = useRef(null);
-  const observer = useRef(null);
+const ScrollBar = forwardRef(
+  ({ children, backgroundColor, showButtons, height }, ref) => {
+    const contentRef = useRef(null);
+    const scrollTrackRef = useRef(null);
+    const scrollThumbRef = useRef(null);
+    const observer = useRef(null);
 
-  const [thumbHeight, setThumbHeight] = useState(20);
-  const [isDragging, setIsDragging] = useState(false);
-  const [scrollStartPosition, setScrollStartPosition] = useState(0);
-  const [initialContentScrollTop, setInitialContentScrollTop] = useState(0);
+    const [thumbHeight, setThumbHeight] = useState(20);
+    const [isDragging, setIsDragging] = useState(false);
+    const [scrollStartPosition, setScrollStartPosition] = useState(0);
+    const [initialContentScrollTop, setInitialContentScrollTop] = useState(0);
 
-  const [thumbVisible, setThumbVisible] = useState(false);
-  const visibilityTimer = useRef(null);
-  const showThumb = () => {
-    setThumbVisible(true);
-    clearTimeout(visibilityTimer.current);
-    visibilityTimer.current = setTimeout(() => {
-      setThumbVisible(false);
-    }, 2000); // Hide thumb after 2 seconds of inactivity
-  };
+    const [thumbVisible, setThumbVisible] = useState(false);
+    const visibilityTimer = useRef(null);
 
-  function handleResize() {
-    setThumbHeight(40);
-  }
+    useImperativeHandle(ref, () => ({
+      scrollToTop: () => {
+        if (contentRef.current) {
+          contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      },
+      scrollToBottom: () => {
+        if (contentRef.current) {
+          contentRef.current.scrollTo({
+            top: contentRef.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      },
+      getContentRef: () => contentRef.current,
+    }));
 
-  function handleThumbPosition() {
-    if (
-      !contentRef.current ||
-      !scrollTrackRef.current ||
-      !scrollThumbRef.current
-    ) {
-      return;
+    const showThumb = () => {
+      setThumbVisible(true);
+      clearTimeout(visibilityTimer.current);
+      visibilityTimer.current = setTimeout(() => {
+        setThumbVisible(false);
+      }, 2000); // Hide thumb after 2 seconds of inactivity
+    };
+
+    function handleResize() {
+      setThumbHeight(40);
     }
 
-    const { scrollTop: contentTop, scrollHeight: contentHeight } =
-      contentRef.current;
-    const { clientHeight: trackHeight } = scrollTrackRef.current;
+    function handleThumbPosition() {
+      if (
+        !contentRef.current ||
+        !scrollTrackRef.current ||
+        !scrollThumbRef.current
+      ) {
+        return;
+      }
 
-    let newTop =
-      (contentTop / (contentHeight - contentRef.current.clientHeight)) *
-      (trackHeight - thumbHeight);
+      const { scrollTop: contentTop, scrollHeight: contentHeight } =
+        contentRef.current;
+      const { clientHeight: trackHeight } = scrollTrackRef.current;
 
-    newTop = Math.min(newTop, trackHeight - thumbHeight);
+      let newTop =
+        (contentTop / (contentHeight - contentRef.current.clientHeight)) *
+        (trackHeight - thumbHeight);
 
-    const thumb = scrollThumbRef.current;
-    requestAnimationFrame(() => {
-      thumb.style.top = `${newTop}px`;
-    });
-  }
+      newTop = Math.min(newTop, trackHeight - thumbHeight);
 
-  function handleTrackClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const { current: track } = scrollTrackRef;
-    const { current: content } = contentRef;
-    if (track && content) {
-      const clientY = e.clientY || e.touches[0].clientY; // Use touch position if available
-      const rect = track.getBoundingClientRect();
-      const trackTop = rect.top;
-      const thumbOffset = -(thumbHeight / 2);
-      const clickRatio =
-        (clientY - trackTop + thumbOffset) / track.clientHeight;
-      const scrollAmount = Math.floor(clickRatio * content.scrollHeight);
-      content.scrollTo({
-        top: scrollAmount,
-        behavior: "smooth",
+      const thumb = scrollThumbRef.current;
+      requestAnimationFrame(() => {
+        thumb.style.top = `${newTop}px`;
       });
     }
-  }
 
-  useEffect(() => {
-    const content = contentRef.current;
-    const track = scrollTrackRef.current;
-
-    if (content) {
-      observer.current = new ResizeObserver(() => {
-        handleResize();
-        handleThumbPosition();
-      });
-      observer.current.observe(content);
-      content.addEventListener("scroll", handleThumbPosition, {
-        passive: true,
-      });
-      content.addEventListener("scroll", showThumb);
-      return () => {
-        observer.current?.unobserve(content);
-        content.removeEventListener("scroll", handleThumbPosition);
-        content.removeEventListener("scroll", showThumb);
-      };
-    }
-
-    if (track) {
-      observer.current = new ResizeObserver(() => {
-        handleResize();
-      });
-      observer.current.observe(content);
-      track.addEventListener("touchstart", handleTrackClick, { passive: true });
-      track.addEventListener("touchstart", showThumb);
-      return () => {
-        observer.current?.unobserve(content);
-        track.removeEventListener("touchstart", handleTrackClick);
-        track.removeEventListener("touchstart", showThumb);
-      };
-    }
-  }, [handleResize, handleThumbPosition]);
-
-  function handleThumbMousedown(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const clientY = e.clientY || e.touches?.[0]?.clientY;
-    setScrollStartPosition(clientY);
-    if (contentRef.current)
-      setInitialContentScrollTop(contentRef.current.scrollTop);
-    setIsDragging(true);
-  }
-
-  function handleThumbMouseup(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isDragging) {
-      setIsDragging(false);
-    }
-  }
-
-  function handleThumbMousemove(e) {
-    if (contentRef.current) {
-      if (isDragging) {
-        const clientY = e.clientY || e.touches?.[0]?.clientY; // Handle touch events
-        e.preventDefault(); // Prevent pull-to-refresh
-        e.stopPropagation();
-        const {
-          scrollHeight: contentScrollHeight,
-          clientHeight: contentClientHeight,
-        } = contentRef.current;
-
-        const trackHeight = scrollTrackRef.current?.clientHeight || 0;
-        const deltaY =
-          ((clientY - scrollStartPosition) / (trackHeight - thumbHeight)) *
-          (contentScrollHeight - contentClientHeight); // Adjust scroll proportionally
-
-        const newScrollTop = Math.min(
-          initialContentScrollTop + deltaY,
-          contentScrollHeight - contentClientHeight
-        );
-
-        contentRef.current.scrollTop = Math.max(newScrollTop, 0);
+    function handleTrackClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const { current: track } = scrollTrackRef;
+      const { current: content } = contentRef;
+      if (track && content) {
+        const clientY = e.clientY || e.touches[0].clientY; // Use touch position if available
+        const rect = track.getBoundingClientRect();
+        const trackTop = rect.top;
+        const thumbOffset = -(thumbHeight / 2);
+        const clickRatio =
+          (clientY - trackTop + thumbOffset) / track.clientHeight;
+        const scrollAmount = Math.floor(clickRatio * content.scrollHeight);
+        content.scrollTo({
+          top: scrollAmount,
+          behavior: "smooth",
+        });
       }
     }
-  }
 
-  function handleThumbTouchStart(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    useEffect(() => {
+      const content = contentRef.current;
+      const track = scrollTrackRef.current;
 
-    const touchY = e.touches[0].clientY; // Get the touch Y position
-    setScrollStartPosition(touchY);
-    if (contentRef.current) {
-      setInitialContentScrollTop(contentRef.current.scrollTop);
+      if (content) {
+        observer.current = new ResizeObserver(() => {
+          handleResize();
+          handleThumbPosition();
+        });
+        observer.current.observe(content);
+        content.addEventListener("scroll", handleThumbPosition, {
+          passive: true,
+        });
+        content.addEventListener("scroll", showThumb);
+        return () => {
+          observer.current?.unobserve(content);
+          content.removeEventListener("scroll", handleThumbPosition);
+          content.removeEventListener("scroll", showThumb);
+        };
+      }
+
+      if (track) {
+        observer.current = new ResizeObserver(() => {
+          handleResize();
+        });
+        observer.current.observe(content);
+        track.addEventListener("touchstart", handleTrackClick, {
+          passive: true,
+        });
+        track.addEventListener("touchstart", showThumb);
+        return () => {
+          observer.current?.unobserve(content);
+          track.removeEventListener("touchstart", handleTrackClick);
+          track.removeEventListener("touchstart", showThumb);
+        };
+      }
+    }, [handleResize, handleThumbPosition]);
+
+    function handleThumbMousedown(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const clientY = e.clientY || e.touches?.[0]?.clientY;
+      setScrollStartPosition(clientY);
+      if (contentRef.current)
+        setInitialContentScrollTop(contentRef.current.scrollTop);
+      setIsDragging(true);
     }
-    setIsDragging(true);
-  }
 
-  useEffect(() => {
-    const handleThumbTouchmove = (e) => {
-      if (isDragging) handleThumbMousemove(e);
-    };
-    const handleThumbTouchend = (e) => handleThumbMouseup(e);
+    function handleThumbMouseup(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isDragging) {
+        setIsDragging(false);
+      }
+    }
 
-    document.addEventListener("mousemove", handleThumbMousemove);
-    document.addEventListener("mouseup", handleThumbMouseup);
+    function handleThumbMousemove(e) {
+      if (contentRef.current) {
+        if (isDragging) {
+          const clientY = e.clientY || e.touches?.[0]?.clientY; // Handle touch events
+          e.preventDefault(); // Prevent pull-to-refresh
+          e.stopPropagation();
+          const {
+            scrollHeight: contentScrollHeight,
+            clientHeight: contentClientHeight,
+          } = contentRef.current;
 
-    // Add passive: false only for thumb-related events
-    scrollThumbRef.current?.addEventListener(
-      "touchmove",
-      handleThumbTouchmove,
-      { passive: false }
-    );
-    scrollThumbRef.current?.addEventListener("touchend", handleThumbTouchend);
+          const trackHeight = scrollTrackRef.current?.clientHeight || 0;
+          const deltaY =
+            ((clientY - scrollStartPosition) / (trackHeight - thumbHeight)) *
+            (contentScrollHeight - contentClientHeight); // Adjust scroll proportionally
 
-    return () => {
-      document.removeEventListener("mousemove", handleThumbMousemove);
-      document.removeEventListener("mouseup", handleThumbMouseup);
+          const newScrollTop = Math.min(
+            initialContentScrollTop + deltaY,
+            contentScrollHeight - contentClientHeight
+          );
 
-      scrollThumbRef.current?.removeEventListener(
+          contentRef.current.scrollTop = Math.max(newScrollTop, 0);
+        }
+      }
+    }
+
+    function handleThumbTouchStart(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const touchY = e.touches[0].clientY; // Get the touch Y position
+      setScrollStartPosition(touchY);
+      if (contentRef.current) {
+        setInitialContentScrollTop(contentRef.current.scrollTop);
+      }
+      setIsDragging(true);
+    }
+
+    useEffect(() => {
+      const handleThumbTouchmove = (e) => {
+        if (isDragging) handleThumbMousemove(e);
+      };
+      const handleThumbTouchend = (e) => handleThumbMouseup(e);
+
+      document.addEventListener("mousemove", handleThumbMousemove);
+      document.addEventListener("mouseup", handleThumbMouseup);
+
+      // Add passive: false only for thumb-related events
+      scrollThumbRef.current?.addEventListener(
         "touchmove",
-        handleThumbTouchmove
+        handleThumbTouchmove,
+        { passive: false }
       );
-      scrollThumbRef.current?.removeEventListener(
-        "touchend",
-        handleThumbTouchend
-      );
-    };
-  }, [isDragging]);
+      scrollThumbRef.current?.addEventListener("touchend", handleThumbTouchend);
 
-  useEffect(() => {
-    return () => {
-      // Clear visibility timer when component unmounts
-      clearTimeout(visibilityTimer.current);
-    };
-  }, []);
+      return () => {
+        document.removeEventListener("mousemove", handleThumbMousemove);
+        document.removeEventListener("mouseup", handleThumbMouseup);
 
-  function handleScrollButton(direction) {
-    const { current: content } = contentRef;
-    if (content) {
-      const scrollAmount = direction === "down" ? 200 : -200;
-      content.scrollBy({ top: scrollAmount, behavior: "smooth" });
+        scrollThumbRef.current?.removeEventListener(
+          "touchmove",
+          handleThumbTouchmove
+        );
+        scrollThumbRef.current?.removeEventListener(
+          "touchend",
+          handleThumbTouchend
+        );
+      };
+    }, [isDragging]);
+
+    useEffect(() => {
+      return () => {
+        // Clear visibility timer when component unmounts
+        clearTimeout(visibilityTimer.current);
+      };
+    }, []);
+
+    function handleScrollButton(direction) {
+      const { current: content } = contentRef;
+      if (content) {
+        const scrollAmount = direction === "down" ? 200 : -200;
+        content.scrollBy({ top: scrollAmount, behavior: "smooth" });
+      }
     }
-  }
 
-  return (
-    <ScrollContainer
-      className="container"
-      onTouchMove={(e) => {
-        if (isDragging) e.preventDefault(); // Prevent default only when dragging
-      }}
-    >
-      <Content
-        className="content"
-        id="custom-scrollbars-content"
-        ref={contentRef}
-        showbuttons={showButtons ? "true" : undefined}
-        height={height}
+    return (
+      <ScrollContainer
+        className="container"
+        onTouchMove={(e) => {
+          if (isDragging) e.preventDefault(); // Prevent default only when dragging
+        }}
       >
-        {children}
-      </Content>
-      <Scroll
-        className="scrollbar"
-        showbuttons={showButtons ? "true" : undefined}
-      >
-        {showButtons && (
-          <button
-            className="button button--up"
-            onClick={() => handleScrollButton("up")}
-            onTouchStart={() => handleScrollButton("up")}
-          >
-            ↑
-          </button>
-        )}
-        <TracknThumb
-          className="track-and-thumb"
-          role="scrollbar"
-          aria-controls="custom-scrollbars-content"
+        <Content
+          className="content"
+          id="custom-scrollbars-content"
+          ref={contentRef}
+          showbuttons={showButtons ? "true" : undefined}
+          height={height}
         >
-          <Track
-            className="track"
-            ref={scrollTrackRef}
-            onClick={handleTrackClick}
-            onTouchStart={handleTrackClick}
-            $backgroundcolor={backgroundColor}
-            style={{
-              cursor: isDragging ? "grabbing" : undefined,
-            }}
-          ></Track>
-          <Thumb
-            className="thumb"
-            ref={scrollThumbRef}
-            onMouseDown={handleThumbMousedown}
-            $isvisible={thumbVisible ? "true" : undefined}
-            onTouchStart={handleThumbTouchStart}
-            style={{
-              height: `${thumbHeight}px`,
-              cursor: isDragging ? "grabbing" : "grab",
-              opacity: thumbVisible ? 0.5 : 0,
-              transition: "opacity 0.3s",
-            }}
-          ></Thumb>
-        </TracknThumb>
-        {showButtons && (
-          <button
-            className="button button--down"
-            onClick={() => handleScrollButton("down")}
-            onTouchStart={() => handleScrollButton("down")}
+          {children}
+        </Content>
+        <Scroll
+          className="scrollbar"
+          showbuttons={showButtons ? "true" : undefined}
+        >
+          {showButtons && (
+            <button
+              className="button button--up"
+              onClick={() => handleScrollButton("up")}
+              onTouchStart={() => handleScrollButton("up")}
+            >
+              ↑
+            </button>
+          )}
+          <TracknThumb
+            className="track-and-thumb"
+            role="scrollbar"
+            aria-controls="custom-scrollbars-content"
           >
-            ↓
-          </button>
-        )}
-      </Scroll>
-    </ScrollContainer>
-  );
-};
+            <Track
+              className="track"
+              ref={scrollTrackRef}
+              onClick={handleTrackClick}
+              onTouchStart={handleTrackClick}
+              $backgroundcolor={backgroundColor}
+              style={{
+                cursor: isDragging ? "grabbing" : undefined,
+              }}
+            ></Track>
+            <Thumb
+              className="thumb"
+              ref={scrollThumbRef}
+              onMouseDown={handleThumbMousedown}
+              $isvisible={thumbVisible ? "true" : undefined}
+              onTouchStart={handleThumbTouchStart}
+              style={{
+                height: `${thumbHeight}px`,
+                cursor: isDragging ? "grabbing" : "grab",
+                opacity: thumbVisible ? 0.5 : 0,
+                transition: "opacity 0.3s",
+              }}
+            ></Thumb>
+          </TracknThumb>
+          {showButtons && (
+            <button
+              className="button button--down"
+              onClick={() => handleScrollButton("down")}
+              onTouchStart={() => handleScrollButton("down")}
+            >
+              ↓
+            </button>
+          )}
+        </Scroll>
+      </ScrollContainer>
+    );
+  }
+);
 
 ScrollBar.propTypes = {
   children: PropTypes.node.isRequired,
-  backgroundColor: PropTypes.node.isRequired,
-  showButtons: PropTypes.node.isRequired,
-  height: PropTypes.node.isRequired,
+  backgroundColor: PropTypes.string.isRequired,
+  showButtons: PropTypes.bool.isRequired,
+  height: PropTypes.string.isRequired,
 };
+ScrollBar.displayName = "ScrollBar";
 export default ScrollBar;

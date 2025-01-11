@@ -27,7 +27,7 @@ const Container = styled.div`
   margin: auto;
   display: flex;
   flex-direction: column;
-  gap: 3.2rem;
+  gap: 2rem;
 `;
 
 const AppLayout = () => {

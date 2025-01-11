@@ -5,6 +5,7 @@ import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import { useForm } from "react-hook-form";
 import { useAddCustomer } from "./useAddCustomer";
+import { useNavigate } from "react-router-dom";
 // import FileInput from "../../ui/FileInput";
 // import Textarea from "../../ui/Textarea";
 
@@ -44,6 +45,7 @@ const Error = styled.span`
 `;
 
 const AddCustomerForm = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, reset, formState } = useForm();
   const { errors } = formState;
   const [serverErrorMessage, setServerErrorMessage] = useState("");
@@ -54,16 +56,14 @@ const AddCustomerForm = () => {
   );
 
   function onAddCustomer(data) {
-    console.log(data);
-    addCustomer(data);
-  }
-
-  function onError(errors) {
-    console.log(errors);
+    addCustomer(data, {
+      onSuccess: (newCustomer) =>
+        navigate(`/addTransaction/${newCustomer.data._id}`),
+    });
   }
 
   return (
-    <Form onSubmit={handleSubmit(onAddCustomer, onError)}>
+    <Form onSubmit={handleSubmit(onAddCustomer)}>
       <FormRow>
         <Label htmlFor="customerName">Customer name</Label>
         <Input
@@ -72,6 +72,7 @@ const AddCustomerForm = () => {
           disabled={isAdding}
           {...register("customerName", {
             required: "Customer name is required",
+            onChange: () => setServerErrorMessage(""),
           })}
         />
         {(errors?.customerName?.message || serverErrorMessage) && (
