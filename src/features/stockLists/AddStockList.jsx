@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../../ui/Button";
 import styled from "styled-components";
 import { useAddStockList } from "./useAddStockList";
@@ -53,17 +53,6 @@ const Textarea = styled.textarea`
   max-height: 18rem;
 `;
 
-// const Error = styled.span`
-//   font-size: 1.4rem;
-//   color: var(--color-red-700);
-//   position: fixed;
-//   bottom: 130px;
-//   z-index: 3;
-//   @media (min-width: 1024px) {
-//     bottom: 85px;
-//   }
-// `;
-
 const AddStockList = () => {
   const { register, handleSubmit, reset } = useForm();
   // const { errors } = formState;
@@ -73,9 +62,17 @@ const AddStockList = () => {
   const [value, setValue] = useState(""); // State to track textarea value
   const textareaRef = useRef(null); // Ref for the textarea DOM element
 
+  useEffect(() => {
+    const savedText = localStorage.getItem("stockListContent");
+    if (savedText) {
+      setValue(savedText);
+    }
+  }, []);
+
   const handleChange = (e) => {
     setValue(e.target.value); // Update the value
     adjustHeight(e.target); // Adjust height dynamically
+    localStorage.setItem("stockListContent", e.target.value);
   };
 
   const adjustHeight = (textarea) => {
@@ -86,11 +83,10 @@ const AddStockList = () => {
   const [renderKey, setRenderKey] = useState(0); // Rename key to avoid conflict
 
   const onAddStockList = (data) => {
-    console.log(data); // Log the form data
-
     addStockList(data, {
       onSuccess: () => {
         setValue("");
+        localStorage.setItem("stockListContent", "");
         reset();
         setRenderKey((prevKey) => prevKey + 1); // Increment key to force re-render
       },

@@ -50,7 +50,8 @@ const CustomerStats = styled(CustomerDetailRow)`
   flex-direction: row;
   background-color: var(--color-silver-100);
   /* color: var(--color-red-700); */
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  font-weight: 600;
   justify-content: space-around;
   gap: 1rem;
   padding: 1rem;
@@ -97,14 +98,16 @@ const CustomerRow = () => {
 
   if (customers?.data.length === 0 || !customers) return <PageNotFound />;
 
+  // console.log(customers.data);
+
   return (
     <>
       <TotalCustomers>Total Customers : {customers.data.length}</TotalCustomers>
       <CustomerStats>
         <p>
           Highest Debtor :{" "}
-          {capitalizeFirstLetter(customerWithHighestDebt.customerName)},{" "}
-          {formatCurrency(customerWithHighestDebt.totalOutstandingDebt)}
+          {capitalizeFirstLetter(customerWithHighestDebt.customerName)} (
+          {formatCurrency(customerWithHighestDebt.totalOutstandingDebt)})
         </p>
         <p>
           {" "}
@@ -123,7 +126,7 @@ const CustomerRow = () => {
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
-        height="60vh"
+        height="56dvh"
       >
         {customers.data.map((customer) => (
           <CustomerDetailRow
@@ -140,12 +143,14 @@ const CustomerRow = () => {
             <Name>{capitalizeFirstLetter(customer.customerName)}</Name>
             <OutstandingDebt
               style={
-                customer.totalOutstandingDebt < 0
+                customer.totalOutstandingDebt <= 0
                   ? { color: "var(--color-green-700)" }
                   : {}
               }
             >
-              {formatCurrency(customer.totalOutstandingDebt)}
+              {customer.totalOutstandingDebt === 0
+                ? "PAID"
+                : formatCurrency(customer.totalOutstandingDebt)}
             </OutstandingDebt>
           </CustomerDetailRow>
         ))}

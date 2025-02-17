@@ -18,3 +18,20 @@ export async function addTransaction(transaction, customerId) {
   }
   return data;
 }
+
+export async function getAllTransactions(customerId) {
+  const { data, error } = await axios.get(
+    `http://192.168.1.20:8000/api/v1/shopOwners/transactions/all-transactions/${customerId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+    }
+  );
+
+  if (error) {
+    console.error(error.request.response);
+    throw new Error("Transactions cannot be found");
+  }
+  return data;
+}

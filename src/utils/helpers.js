@@ -1,7 +1,8 @@
 import { formatDistance, parseISO, format } from "date-fns";
 import { differenceInDays } from "date-fns";
 
-export const formatDate = (date) => format(new Date(date), "PPpp");
+export const formatDate = (date) =>
+  format(new Date(date), "EEE, MMM d, yyyy h:mm a");
 export const formatAndGetDate = (date) => {
   const options = { day: "numeric", month: "short", year: "numeric" };
   const formattedDate = new Date(date).toLocaleDateString("en-US", options);
@@ -42,9 +43,12 @@ export const getToday = function (options = {}) {
 };
 
 export const formatCurrency = (value) =>
-  new Intl.NumberFormat("en", { style: "currency", currency: "INR" }).format(
-    Math.abs(value)
-  );
+  new Intl.NumberFormat("en", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(Math.abs(value));
 
 export const capitalizeFirstLetter = (word) => {
   if (!word) return "";

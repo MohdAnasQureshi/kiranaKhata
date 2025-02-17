@@ -81,7 +81,7 @@ const StyledAddCustomer = styled(StyledNavLink)`
   }
 
   & svg {
-    color: var(--color-grey-600);
+    color: var(--color-grey-400);
     height: 3.8rem;
     width: 3.8rem;
     transition: all 0.3s;

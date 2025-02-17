@@ -18,6 +18,16 @@ const StockDetails = styled.div`
   padding: 1rem 10rem 1rem 1rem;
   position: relative;
   white-space: pre-wrap;
+
+  @media (max-width: 376px) {
+    /* iPhone SE (375px wide) */
+    font-size: 14px;
+  }
+
+  @media (max-width: 320px) {
+    /* Older, smaller devices */
+    font-size: 12px;
+  }
 `;
 
 const DateLabel = styled.div`
@@ -35,6 +45,10 @@ const DateLabel = styled.div`
   @media (min-width: 1024px) {
     left: 65%;
   }
+  @media (max-width: 376px) {
+    /* iPhone SE (375px wide) */
+    font-size: 12px;
+  }
 `;
 
 const DateLabel2 = styled.div`
@@ -45,6 +59,10 @@ const DateLabel2 = styled.div`
   background-color: var(--color-brand-50);
   padding: 0.5rem;
   margin: auto;
+  @media (max-width: 376px) {
+    /* iPhone SE (375px wide) */
+    font-size: 12px;
+  }
 `;
 
 const StockLists = () => {
@@ -96,7 +114,7 @@ const StockLists = () => {
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
-        height="65vh"
+        height="65dvh"
         ref={scrollBarRef}
       >
         {stockOrderLists?.data?.map((list, index, arr) => {

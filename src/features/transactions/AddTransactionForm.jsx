@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Form from "../../ui/Form";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
@@ -9,24 +9,29 @@ import toast from "react-hot-toast";
 import { useLocation, useParams } from "react-router-dom";
 
 import Textarea from "../../ui/Textarea";
+import AllTransactions from "./AllTransactions";
+
+const CustomerDetailRow = styled.div`
+  font-size: 2rem;
+  background-color: red;
+`;
 
 const TransactionForm = styled(Form)`
   display: grid;
-
   gap: 5px;
-  /* width: 60vw; */
-  margin: 0 auto; /* Optional: centers the grid container */
   position: fixed;
   right: 0px;
   left: 0px;
-  bottom: 65px;
-  /* background-color: red; */
-
-  margin: 0 auto; /* Centers the grid container */
-
+  bottom: 68px;
+  margin: 0 auto;
   grid-template-columns: auto auto auto;
   padding: 0.5rem;
   width: 100vw;
+  @media (min-width: 1024px) {
+    left: 25vw;
+    width: 48vw;
+    bottom: 10px;
+  }
 `;
 
 const FormRow = styled.div`
@@ -34,18 +39,12 @@ const FormRow = styled.div`
   flex-direction: row;
   gap: 1.5rem;
   align-items: center;
-  /* justify-content: end; */
-  /* background-color: lightblue;  */
-  /* padding: 20px; */
   text-align: center;
-
-  /* padding: 1rem; */
 
   &:nth-child(1) {
     grid-column-start: 1;
     grid-column-end: 2;
     justify-content: center;
-    /* padding-left: 10px; */
   }
   &:nth-child(2) {
     grid-column-start: 2;
@@ -58,27 +57,23 @@ const FormRow = styled.div`
     grid-column-end: 3;
   }
 
-  /* &:nth-child(4) {
-    width: 20vw;
-  } */
-
-  /* &:first-child {
-    padding-top: 0;
+  @media (min-width: 1024px) {
+    &:nth-child(1) {
+      grid-column-start: 1;
+      grid-column-end: 2;
+      justify-content: flex-start;
+    }
   }
-
-  &:last-child {
-    padding-bottom: 0;
-  } */
 `;
 
 const Label = styled.label`
   font-weight: 500;
-  font-size: 2rem;
+  font-size: 1.7rem;
 `;
 
 const RadioInput = styled.input`
-  appearance: none; /* Removes default radio button styling */
-  border-radius: 50%; /* Makes it circular */
+  appearance: none;
+  border-radius: 50%;
   outline: none;
   border: 2px solid red;
   height: 15px;
@@ -87,6 +82,8 @@ const RadioInput = styled.input`
   padding: 0;
   &:checked {
     background-color: ${({ color }) => color || "#ff6565"};
+    outline: ${({ color }) => `2px solid ${color ? color : "red"}`};
+    outline-offset: 1px;
   }
   &:focus {
     outline: ${({ color }) => `2px solid ${color ? color : "red"}`};
@@ -94,15 +91,9 @@ const RadioInput = styled.input`
   }
 `;
 
-// const Error = styled.span`
-//   font-size: 1.4rem;
-//   color: var(--color-red-700);
-// `;
-
 const AddTransactionForm = () => {
   const { customerId } = useParams(); // Get customerId from URL
-  const { register, handleSubmit, reset } = useForm();
-
+  const { register, handleSubmit, reset, setValue } = useForm();
   const { mutate: addTransaction, isAdding } = useAddTransaction(
     reset,
     customerId
@@ -110,32 +101,69 @@ const AddTransactionForm = () => {
   const location = useLocation();
   const { customerName, customerContact } = location.state || {};
 
+  useEffect(() => {
+    // Retrieve data from localStorage
+    const amount = localStorage.getItem(`amount_${customerId}`);
+    const transactionType = localStorage.getItem(
+      `transactionType_${customerId}`
+    );
+    const transactionDetails = localStorage.getItem(
+      `transactionDetails_${customerId}`
+    );
+
+    // Populate the form fields if data exists
+    if (amount) setValue("amount", amount);
+    if (transactionType) setValue("transactionType", transactionType);
+    if (transactionDetails) setValue("transactionDetails", transactionDetails);
+  }, [setValue]);
+
   function onAddTransaction(data) {
     if (!customerId) {
       toast.error("No customer added");
       return;
     }
     addTransaction(data);
+    localStorage.setItem(`amount_${customerId}`, "");
+    localStorage.setItem(`transactionType_${customerId}`, "");
+    localStorage.setItem(`transactionDetails_${customerId}`, "");
+  }
+
+  function handleChange(e) {
+    const { id, value } = e.target; // Get the element's id and value
+    if (id === "amount") {
+      localStorage.setItem(`amount_${customerId}`, value);
+    }
+    if (id === "debt" || id === "payment") {
+      localStorage.setItem(`transactionType_${customerId}`, value);
+    }
+    if (id === "transactionDetails") {
+      localStorage.setItem(`transactionDetails_${customerId}`, value);
+    }
   }
 
   return (
     <>
-      <div>
+      <CustomerDetailRow>
         {customerName} {customerContact}
-      </div>
+      </CustomerDetailRow>
+      <AllTransactions />
       <TransactionForm onSubmit={handleSubmit(onAddTransaction)}>
         <FormRow>
           <Input
             style={{
               maxWidth: "30vw",
               border: "1px solid var(--color-brand-700)",
+              fontSize: "1.6rem",
             }}
             type="number"
             id="amount"
             placeholder="Amount.."
+            min="0"
+            step="0.01"
             disabled={isAdding}
             {...register("amount", {
               required: "Amount is required",
+              onChange: handleChange,
             })}
           />
         </FormRow>
@@ -149,6 +177,7 @@ const AddTransactionForm = () => {
             placeholder="Debt"
             {...register("transactionType", {
               required: "Required",
+              onChange: handleChange,
             })}
           />
           <Label htmlFor="debt">Debt</Label>
@@ -162,6 +191,7 @@ const AddTransactionForm = () => {
             style={{ border: "2px solid green" }}
             {...register("transactionType", {
               required: "Required",
+              onChange: handleChange,
             })}
           />
           <Label htmlFor="payment">Payment</Label>
@@ -173,13 +203,16 @@ const AddTransactionForm = () => {
             id="transactionDetails"
             style={{
               width: "28rem",
-              height: "4.5rem",
-              fontSize: "2rem",
+              height: "4rem",
+              fontSize: "1.7rem",
               border: "1px solid var(--color-brand-700)",
+              resize: "none",
             }}
             disabled={isAdding}
             placeholder="Details.."
-            {...register("transactionDetails")}
+            {...register("transactionDetails", {
+              onChange: handleChange,
+            })}
           />
         </FormRow>
 
@@ -188,7 +221,7 @@ const AddTransactionForm = () => {
             disabled={isAdding}
             style={{
               borderRadius: "50px",
-              fontSize: "3rem",
+              fontSize: "2.5rem",
               padding: "0.2rem 2.4rem",
             }}
           >
