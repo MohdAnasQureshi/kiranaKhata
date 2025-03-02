@@ -100,3 +100,23 @@ export const calculateMonthsAndDays = (startDate) => {
 
   return { years: yearsDiff, months: monthsDiff, days: daysDiff };
 };
+
+export function getTimeDifference(updatedAt) {
+  const updatedTime = new Date(updatedAt); // Convert MongoDB timestamp to Date
+  const currentTime = new Date(); // Get current time
+
+  if (updatedTime.toDateString() !== currentTime.toDateString()) {
+    return { hours: 0, minutes: 0, seconds: 0 }; // Return zero if dates are different
+  }
+
+  let diffMs = Math.abs(currentTime - updatedTime); // Difference in milliseconds
+
+  const hours = Math.floor(diffMs / (1000 * 60 * 60)); // Convert to hours
+  diffMs -= hours * (1000 * 60 * 60);
+  const minutes = Math.floor(diffMs / (1000 * 60)); // Convert to minutes
+  diffMs -= minutes * (1000 * 60);
+
+  const seconds = Math.floor(diffMs / 1000); // Convert to seconds
+
+  return { hours, minutes, seconds };
+}

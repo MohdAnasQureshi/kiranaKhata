@@ -2,19 +2,6 @@ import { createGlobalStyle } from "styled-components";
 
 const GlobalStyles = createGlobalStyle`
  :root {
-
-	--track-gradient: linear-gradient(
-		to bottom,
-		rgba(175, 48, 41, 1),
-		rgba(188, 82, 21, 1),
-		rgba(173, 131, 1, 1),
-		rgba(102, 128, 11, 1),
-		rgba(36, 131, 123, 1),
-		rgba(32, 94, 166, 1),
-		rgba(94, 64, 157, 1),
-		rgba(160, 47, 111, 1)
-	);
-
     /* Indigo */
     --color-brand-50: #eef2ff;
     --color-brand-100: #e0e7ff;
@@ -54,7 +41,7 @@ const GlobalStyles = createGlobalStyle`
     --color-red-700: #b91c1c;
     --color-red-800: #991b1b;
   
-    --backdrop-color: rgba(255, 255, 255, 0.1);
+    --backdrop-color: rgba(39, 39, 39, 0.22);
   
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
     --shadow-md: 0px 0.6rem 2.4rem rgba(0, 0, 0, 0.06);

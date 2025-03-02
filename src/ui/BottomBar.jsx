@@ -4,8 +4,7 @@ import MainNav from "./MainNav";
 
 const StyledBottomBar = styled.div`
   background-color: var(--color-grey-0);
-  border-top: 1px solid var(--color-grey-100);
-  /* box-shadow: 0 -4px 6px var(--color-grey-100); */
+  border-top: 1px solid var(--color-grey-300);
   position: fixed;
   bottom: 0;
   width: 100vw;
@@ -13,10 +12,11 @@ const StyledBottomBar = styled.div`
   @media (min-width: 1024px) {
     height: 100vh;
     left: 0px;
-    top: 60px;
+    top: 50px;
     width: 30vw;
     padding: 3rem;
-    border-radius: var(--border-radius-lg);
+    border: none;
+    border-right: 1px solid var(--color-grey-300);
   }
 `;
 

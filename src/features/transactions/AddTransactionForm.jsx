@@ -1,20 +1,15 @@
 import React, { useEffect } from "react";
 import Form from "../../ui/Form";
-import { useForm } from "react-hook-form";
+import Textarea from "../../ui/Textarea";
+import AllTransactions from "./AllTransactions";
+import TransactionHeader from "./TransactionHeader";
+import toast from "react-hot-toast";
 import styled from "styled-components";
 import Input from "../../ui/Input";
 import Button from "../../ui/Button";
 import { useAddTransaction } from "./useAddTransaction";
-import toast from "react-hot-toast";
-import { useLocation, useParams } from "react-router-dom";
-
-import Textarea from "../../ui/Textarea";
-import AllTransactions from "./AllTransactions";
-
-const CustomerDetailRow = styled.div`
-  font-size: 2rem;
-  background-color: red;
-`;
+import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
 
 const TransactionForm = styled(Form)`
   display: grid;
@@ -98,8 +93,6 @@ const AddTransactionForm = () => {
     reset,
     customerId
   );
-  const location = useLocation();
-  const { customerName, customerContact } = location.state || {};
 
   useEffect(() => {
     // Retrieve data from localStorage
@@ -143,9 +136,7 @@ const AddTransactionForm = () => {
 
   return (
     <>
-      <CustomerDetailRow>
-        {customerName} {customerContact}
-      </CustomerDetailRow>
+      <TransactionHeader customerId={customerId} />
       <AllTransactions />
       <TransactionForm onSubmit={handleSubmit(onAddTransaction)}>
         <FormRow>

@@ -119,9 +119,6 @@ const AddStockList = () => {
           +
         </Button>
       </StockListForm>
-      {/* {errors?.stockList?.message && (
-        <Error>{errors?.stockList?.message}</Error>
-      )} */}
     </>
   );
 };

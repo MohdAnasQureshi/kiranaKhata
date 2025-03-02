@@ -11,15 +11,16 @@ import PropTypes from "prop-types";
 const ScrollContainer = styled.div`
   position: relative;
   height: 100%;
+  padding: 0.2rem 2rem;
 `;
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
   flex-grow: 1;
   overflow: auto;
-  height: ${(height) => height || "auto"};
+  height: ${({ height }) => height || "auto"};
   padding-right: ${({ showbuttons }) => (showbuttons ? "1rem" : "0")};
 `;
 
@@ -31,6 +32,7 @@ const Scroll = styled.div`
   width: 16px;
   z-index: 10; /* Ensures it overlays the content */
   display: grid;
+  margin-right: 6px;
   grid-template: ${({ showbuttons }) =>
     showbuttons ? "auto 1fr auto / 1fr" : "1fr / 1fr"};
   gap: 0.5rem;
@@ -117,7 +119,6 @@ const ScrollBar = forwardRef(
         if (contentRef.current) {
           contentRef.current.scrollTo({
             top: contentRef.current.scrollHeight,
-            behavior: "smooth",
           });
         }
       },

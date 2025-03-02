@@ -1,17 +1,18 @@
 import React from "react";
 import Row from "../ui/Row";
 import Heading from "../ui/Heading";
-import CustomerRow from "../features/customers/CustomerRow";
+import AllCustomers from "../features/customers/AllCustomers";
+import CustomerListFilterSort from "../features/customers/CustomerListFilterSort";
 
 const Customers = () => {
   return (
     <>
       <Row type="horizontal">
         <Heading as="h2">All Customers</Heading>
-        <p>Filter / Sort</p>
+        <CustomerListFilterSort />
       </Row>
       <Row>
-        <CustomerRow />
+        <AllCustomers />
       </Row>
     </>
   );

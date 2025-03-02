@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useStockOrderLists } from "./useStockOrderLists";
 import ScrollBar from "../../ui/ScrollBar";
 import styled from "styled-components";
 import Spinner from "../../ui/Spinner";
 import { formatAndGetDate, formatDate } from "../../utils/helpers";
+import { useStockOrderLists } from "./useStockOrderLists";
 
 const StockDetails = styled.div`
   display: flex;
@@ -35,11 +35,10 @@ const DateLabel = styled.div`
   border-radius: var(--border-radius-lg);
   color: var(--color-grey-700);
   position: fixed;
-  top: 100px;
   background-color: var(--color-brand-50);
   padding: 0.5rem;
   left: 50%;
-  top: 130px;
+  top: 105px;
   transform: translate(-50%, -50%);
 
   @media (min-width: 1024px) {
@@ -71,6 +70,9 @@ const StockLists = () => {
   const { isLoading, stockOrderLists } = useStockOrderLists();
   const scrollBarRef = useRef(null);
 
+  const today = new Date();
+  const yesterday = new Date(Date.now() - 86400000);
+
   useEffect(() => {
     // Automatically scroll to bottom when stockOrderLists updates
     if (stockOrderLists) {
@@ -88,7 +90,7 @@ const StockLists = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.boundingClientRect.top > 0) {
+          if (entry.isIntersecting) {
             setCurrentDate(entry.target.dataset.list);
           }
         });
@@ -110,11 +112,20 @@ const StockLists = () => {
   if (isLoading) return <Spinner />;
   return (
     <>
-      <div>All Stocks Lists</div>
+      <div
+        style={{
+          fontSize: "2rem",
+          fontWeight: "500",
+          margin: "5px 5px 0 5px",
+          textAlign: "center",
+        }}
+      >
+        All Stocks Lists
+      </div>
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
-        height="65dvh"
+        height="70dvh"
         ref={scrollBarRef}
       >
         {stockOrderLists?.data?.map((list, index, arr) => {
@@ -127,9 +138,25 @@ const StockLists = () => {
 
           return (
             <React.Fragment key={list._id}>
-              {currentDate && <DateLabel>{currentDate}</DateLabel>}
+              {currentDate && (
+                <DateLabel>
+                  {currentDate === formatAndGetDate(today)
+                    ? `Today, ${currentDate}`
+                    : currentDate === formatAndGetDate(yesterday)
+                      ? `Yesterday, ${currentDate}`
+                      : currentDate}
+                </DateLabel>
+              )}
 
-              {isNewDate && <DateLabel2>{currentFormattedDate}</DateLabel2>}
+              {isNewDate && (
+                <DateLabel2>
+                  {currentFormattedDate === formatAndGetDate(today)
+                    ? `Today`
+                    : currentFormattedDate === formatAndGetDate(yesterday)
+                      ? "Yesterday"
+                      : currentFormattedDate}
+                </DateLabel2>
+              )}
               <StockDetails
                 className="content-item"
                 data-list={formatAndGetDate(list.createdAt)}

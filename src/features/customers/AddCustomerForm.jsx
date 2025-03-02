@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
+import PropTypes from "prop-types";
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import { useForm } from "react-hook-form";
 import { useAddCustomer } from "./useAddCustomer";
 import { useNavigate } from "react-router-dom";
-// import FileInput from "../../ui/FileInput";
-// import Textarea from "../../ui/Textarea";
+import { useEditCustomer } from "./useEditCustomer";
+import { ModalContext } from "../../ui/Modal";
 
 const FormRow = styled.div`
   display: flex;
@@ -44,9 +45,14 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-const AddCustomerForm = () => {
+const AddCustomerForm = ({ customerToEdit = {} }) => {
+  const { close } = useContext(ModalContext) || {};
+  const { customerId: editCustomerId, ...editCustomerValues } = customerToEdit;
+  const isEditSession = Boolean(editCustomerId);
   const navigate = useNavigate();
-  const { register, handleSubmit, reset, formState } = useForm();
+  const { register, handleSubmit, reset, formState } = useForm({
+    defaultValues: isEditSession ? editCustomerValues : {},
+  });
   const { errors } = formState;
   const [serverErrorMessage, setServerErrorMessage] = useState("");
 
@@ -55,11 +61,35 @@ const AddCustomerForm = () => {
     reset
   );
 
+  const { mutate: editCustomer, isEditing } = useEditCustomer(
+    setServerErrorMessage,
+    close
+  );
+
   function onAddCustomer(data) {
-    addCustomer(data, {
-      onSuccess: (newCustomer) =>
-        navigate(`/addTransaction/${newCustomer.data._id}`),
-    });
+    if (isEditSession)
+      editCustomer(
+        { editedCustomerData: data, customerId: editCustomerId },
+        {
+          onSuccess: (editedCustomer) =>
+            navigate(`/addTransaction/${editCustomerId}`, {
+              state: {
+                customerName: editedCustomer.data.customerName,
+                customerContact: editedCustomer.data.customerContact,
+              },
+            }),
+        }
+      );
+    else
+      addCustomer(data, {
+        onSuccess: (newCustomer) =>
+          navigate(`/addTransaction/${newCustomer.data._id}`, {
+            state: {
+              customerName: newCustomer.data.customerName,
+              customerContact: newCustomer.data.customerContact,
+            },
+          }),
+      });
   }
 
   return (
@@ -69,7 +99,7 @@ const AddCustomerForm = () => {
         <Input
           type="text"
           id="customerName"
-          disabled={isAdding}
+          disabled={isAdding || isEditing}
           {...register("customerName", {
             required: "Customer name is required",
             onChange: () => setServerErrorMessage(""),
@@ -85,20 +115,22 @@ const AddCustomerForm = () => {
         <Input
           type="number"
           id="customerContact"
-          disabled={isAdding}
+          disabled={isAdding || isEditing}
           {...register("customerContact")}
         />
       </FormRow>
 
       <FormRow>
-        {/* type is an HTML attribute! */}
-        {/* <Button variation="secondary" type="reset">
-          Cancel
-        </Button> */}
-        <Button disabled={isAdding}>Add Customer</Button>
+        <Button disabled={isAdding || isEditing}>
+          {isEditSession ? "Edit Customer" : "Add Customer"}
+        </Button>
       </FormRow>
     </Form>
   );
+};
+
+AddCustomerForm.propTypes = {
+  customerToEdit: PropTypes.object,
 };
 
 export default AddCustomerForm;

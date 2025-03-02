@@ -1,44 +1,58 @@
+import React, { useContext } from "react";
 import styled from "styled-components";
 import Button from "./Button";
 import Heading from "./Heading";
+import PropTypes from "prop-types";
+import { ModalContext } from "./Modal";
+import { capitalizeFirstLetter } from "../utils/helpers";
 
 const StyledConfirmDelete = styled.div`
-  width: 40rem;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 2rem;
 
   & p {
-    color: var(--color-grey-500);
-    margin-bottom: 1.2rem;
+    color: var(--color-grey-600);
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
   }
 
   & div {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 1.2rem;
   }
 `;
 
-function ConfirmDelete({ resourceName, onConfirm, disabled }) {
+function ConfirmDelete({ resourceName, disabled, onConfirm }) {
+  const { close } = useContext(ModalContext);
+
   return (
     <StyledConfirmDelete>
-      <Heading as="h3">Delete {resourceName}</Heading>
+      <Heading as="h3">Delete {capitalizeFirstLetter(resourceName)}</Heading>
       <p>
-        Are you sure you want to delete this {resourceName} permanently? This
-        action cannot be undone.
+        Are you sure you want to delete this{" "}
+        {capitalizeFirstLetter(resourceName)} permanently? This action cannot be
+        undone and all the transactions of this customer will be deleted
+        permanently.
       </p>
 
       <div>
-        <Button variation="secondary" disabled={disabled}>
+        <Button $variation="secondary" disabled={disabled} onClick={close}>
           Cancel
         </Button>
-        <Button variation="danger" disabled={disabled}>
+        <Button $variation="danger" disabled={disabled} onClick={onConfirm}>
           Delete
         </Button>
       </div>
     </StyledConfirmDelete>
   );
 }
+
+ConfirmDelete.propTypes = {
+  resourceName: PropTypes.string,
+  disabled: PropTypes.bool,
+  onConfirm: PropTypes.func,
+};
 
 export default ConfirmDelete;
