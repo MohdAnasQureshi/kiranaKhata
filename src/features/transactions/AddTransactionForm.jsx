@@ -64,25 +64,26 @@ const FormRow = styled.div`
 const Label = styled.label`
   font-weight: 500;
   font-size: 1.7rem;
+  padding-right: 1rem;
 `;
 
 const RadioInput = styled.input`
   appearance: none;
   border-radius: 50%;
-  outline: none;
-  border: 2px solid red;
-  height: 15px;
-  width: 15px;
+  outline: 2px solid var(--color-grey-400);
+  border: none;
+  height: 12px;
+  width: 12px;
   cursor: pointer;
   padding: 0;
   &:checked {
     background-color: ${({ color }) => color || "#ff6565"};
     outline: ${({ color }) => `2px solid ${color ? color : "red"}`};
-    outline-offset: 1px;
+    outline-offset: 2px;
   }
   &:focus {
     outline: ${({ color }) => `2px solid ${color ? color : "red"}`};
-    outline-offset: 1px;
+    outline-offset: 2px;
   }
 `;
 
@@ -97,16 +98,12 @@ const AddTransactionForm = () => {
   useEffect(() => {
     // Retrieve data from localStorage
     const amount = localStorage.getItem(`amount_${customerId}`);
-    const transactionType = localStorage.getItem(
-      `transactionType_${customerId}`
-    );
     const transactionDetails = localStorage.getItem(
       `transactionDetails_${customerId}`
     );
 
     // Populate the form fields if data exists
     if (amount) setValue("amount", amount);
-    if (transactionType) setValue("transactionType", transactionType);
     if (transactionDetails) setValue("transactionDetails", transactionDetails);
   }, [setValue]);
 
@@ -117,7 +114,6 @@ const AddTransactionForm = () => {
     }
     addTransaction(data);
     localStorage.setItem(`amount_${customerId}`, "");
-    localStorage.setItem(`transactionType_${customerId}`, "");
     localStorage.setItem(`transactionDetails_${customerId}`, "");
   }
 
@@ -165,7 +161,6 @@ const AddTransactionForm = () => {
             name="transactionType"
             value="debt"
             id="debt"
-            placeholder="Debt"
             {...register("transactionType", {
               required: "Required",
               onChange: handleChange,
@@ -179,7 +174,6 @@ const AddTransactionForm = () => {
             value="payment"
             id="payment"
             color="#3db469"
-            style={{ border: "2px solid green" }}
             {...register("transactionType", {
               required: "Required",
               onChange: handleChange,

@@ -10,8 +10,10 @@ import PropTypes from "prop-types";
 
 const ScrollContainer = styled.div`
   position: relative;
-  height: 100%;
+  max-height: 100dvh;
   padding: 0.2rem 2rem;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Content = styled.div`
@@ -22,6 +24,10 @@ const Content = styled.div`
   overflow: auto;
   height: ${({ height }) => height || "auto"};
   padding-right: ${({ showbuttons }) => (showbuttons ? "1rem" : "0")};
+
+  @media (min-width: 1024px) {
+    height: calc(100dvh - 250px);
+  }
 `;
 
 const Scroll = styled.div`

@@ -17,9 +17,6 @@ import { FiSearch } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 
 const StatsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   transition:
     opacity 0.6s ease,
     transform 0.6s ease,
@@ -73,6 +70,9 @@ const OutstandingDebt = styled.p`
 
 const TotalCustomers = styled.div`
   padding: 0.2rem;
+  padding-top: 0.6rem;
+  font-size: 1.4rem;
+  margin: auto;
 `;
 
 const CustomerStats = styled.div`
@@ -84,13 +84,13 @@ const CustomerStats = styled.div`
   box-shadow: 0 3px 8px var(--color-grey-100);
   flex-direction: row;
   background-color: var(--color-silver-100);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
   justify-content: space-around;
   gap: 1rem;
   padding: 1rem;
-  margin: 1rem;
-  margin-bottom: 0.2rem;
+  margin: 0 0.8rem 0 0.8rem;
+  cursor: pointer;
 `;
 
 const SearchInput = styled(Input)`
@@ -105,6 +105,7 @@ const SearchWrapper = styled.div`
   padding: 0 15px 0 15px;
   width: 100%;
   transition: 0.5s ease;
+  margin-top: 0.8rem;
 `;
 
 const SearchIcon = styled(FiSearch)`
@@ -114,6 +115,7 @@ const SearchIcon = styled(FiSearch)`
   transform: translateY(-50%);
   color: gray;
   font-size: 20px;
+  cursor: pointer;
 `;
 
 const CloseButton = styled(IoClose)`
@@ -124,6 +126,7 @@ const CloseButton = styled(IoClose)`
   color: gray;
   font-size: 26px;
   transition: 0.4s ease;
+  cursor: pointer;
   &:active {
     color: red;
   }
@@ -135,8 +138,8 @@ const AllCustomers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const searchInputRef = useRef(null);
   const [searchParams] = useSearchParams();
-  const filteredValue = searchParams.get("status") || "all";
-
+  const filteredValue =
+    searchParams.get("status") || localStorage.getItem("appliedFilter");
   let filteredCustomers;
 
   if (filteredValue === "all") filteredCustomers = customers?.data;
@@ -162,7 +165,8 @@ const AllCustomers = () => {
 
   // SORT BY
   let sortedCustomers;
-  const sortBy = searchParams.get("sortBy") || "recent";
+  const sortBy =
+    searchParams.get("sortBy") || localStorage.getItem("appliedSort");
   if (sortBy === "recent")
     sortedCustomers = searchedCustomers?.sort(
       (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
@@ -172,7 +176,7 @@ const AllCustomers = () => {
       (a, b) => b.totalOutstandingDebt - a.totalOutstandingDebt
     );
   if (sortBy === "oldest")
-    sortedCustomers = searchedCustomers.sort(
+    sortedCustomers = searchedCustomers?.sort(
       (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
     );
   if (sortBy === "least-debt")
@@ -233,10 +237,6 @@ const AllCustomers = () => {
   return (
     <>
       <StatsContainer $hide={searchTerm.length > 0}>
-        <TotalCustomers>
-          {`Total ${filteredValue === "debtors" ? "debtors" : filteredValue === "depositors" ? "depositors" : filteredValue === "settled" ? "settled customers" : "customers"} : `}{" "}
-          {sortedCustomers.length}
-        </TotalCustomers>
         <CustomerStats>
           <p
             onClick={() =>
@@ -302,15 +302,19 @@ const AllCustomers = () => {
           )}
         </label>
       </SearchWrapper>
+      <TotalCustomers>
+        {`Total ${filteredValue === "debtors" ? "debtors" : filteredValue === "depositors" ? "depositors" : filteredValue === "settled" ? "settled customers" : "customers"} : `}{" "}
+        {sortedCustomers?.length}
+      </TotalCustomers>
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
-        height="55dvh"
+        height="calc(100dvh - 340px)"
       >
-        {sortedCustomers.length === 0 ? (
+        {sortedCustomers?.length === 0 ? (
           <div>No Customer found!</div>
         ) : (
-          sortedCustomers.map((customer) => {
+          sortedCustomers?.map((customer) => {
             const { years, months, days } = calculateMonthsAndDays(
               customer.updatedAt
             );

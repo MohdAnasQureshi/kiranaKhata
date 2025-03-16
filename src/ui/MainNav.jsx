@@ -1,11 +1,10 @@
 import styled from "styled-components";
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { HiHome } from "react-icons/hi2";
-import { HiUsers } from "react-icons/hi2";
-import { HiUserPlus } from "react-icons/hi2";
-import { HiClipboardDocumentCheck } from "react-icons/hi2";
-import { HiMiniCog8Tooth } from "react-icons/hi2";
+import { HiOutlineUserPlus, HiOutlineUsers } from "react-icons/hi2";
+import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
+import { AiOutlineHome } from "react-icons/ai";
+import { IoSettingsOutline } from "react-icons/io5";
 const NavList = styled.ul`
   display: flex;
   flex-direction: row;
@@ -25,9 +24,8 @@ const StyledNavLink = styled(NavLink)`
     color: var(--color-grey-600);
     font-size: 1rem;
     font-weight: 500;
-    padding: 1rem;
+    padding: 0.8rem;
     transition: all 0.3s;
-    margin-top: 2px;
   }
 
   /* This works because react-router places the active class on the active NavLink */
@@ -37,12 +35,7 @@ const StyledNavLink = styled(NavLink)`
   &.active:link,
   &.active:visited {
     color: var(--color-grey-800);
-    background: linear-gradient(
-      to bottom,
-      var(--color-brand-100),
-      transparent 50%
-    );
-    border-radius: var(--border-radius-md);
+    border-top: 2px solid var(--color-brand-600);
   }
 
   & svg {
@@ -71,6 +64,26 @@ const StyledNavLink = styled(NavLink)`
       width: 3rem;
       height: 3rem;
     }
+
+    &:hover,
+    &:active {
+      color: var(--color-grey-800);
+      border-top: 0;
+    }
+    &.active:link,
+    &.active:visited {
+      color: var(--color-grey-800);
+      border-top: 0;
+      border-right: 2px solid var(--color-brand-600);
+    }
+    &:hover svg,
+    &:active svg,
+    &.active:link svg,
+    &.active:visited svg {
+      color: var(--color-brand-600);
+      width: 3rem;
+      height: 3rem;
+    }
   }
 `;
 
@@ -86,6 +99,15 @@ const StyledAddCustomer = styled(StyledNavLink)`
     width: 3.8rem;
     transition: all 0.3s;
   }
+  &:hover svg,
+  &:active svg,
+  &.active:link svg,
+  &.active:visited svg {
+    color: var(--color-brand-600);
+    width: 4rem;
+    height: 4rem;
+  }
+
   @media (min-width: 1024px) {
     &:link,
     :visited {
@@ -93,8 +115,17 @@ const StyledAddCustomer = styled(StyledNavLink)`
     }
     & svg {
       color: var(--color-grey-600);
-      height: 3rem;
-      width: 3rem;
+      height: 3.2rem;
+      width: 3.2rem;
+    }
+
+    &:hover svg,
+    &:active svg,
+    &.active:link svg,
+    &.active:visited svg {
+      color: var(--color-brand-600);
+      width: 3.2rem;
+      height: 3.2rem;
     }
   }
 `;
@@ -105,31 +136,31 @@ const MainNav = () => {
       <NavList>
         <li>
           <StyledNavLink to="/dashboard">
-            <HiHome />
+            <AiOutlineHome />
             <span>Home</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledNavLink to="/customers">
-            <HiUsers />
+            <HiOutlineUsers />
             <span>Customers</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledAddCustomer to="/addCustomer">
-            <HiUserPlus />
+            <HiOutlineUserPlus />
             <span>Add Customer</span>
           </StyledAddCustomer>
         </li>
         <li>
           <StyledNavLink to="/stockOrderList">
-            <HiClipboardDocumentCheck />
+            <HiOutlineClipboardDocumentCheck />
             <span>Stock List</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledNavLink to="/settings">
-            <HiMiniCog8Tooth />
+            <IoSettingsOutline />
             <span>Settings</span>
           </StyledNavLink>
         </li>

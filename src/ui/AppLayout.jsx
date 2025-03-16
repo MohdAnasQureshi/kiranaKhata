@@ -5,7 +5,7 @@ import BottomBar from "./BottomBar";
 import { Outlet } from "react-router-dom";
 
 const StyledAppLayout = styled.div`
-  height: 100vh;
+  height: 100dvh;
 `;
 
 const Main = styled.main`

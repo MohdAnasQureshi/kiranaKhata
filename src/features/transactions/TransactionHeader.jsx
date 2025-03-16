@@ -12,6 +12,8 @@ import { Modal } from "../../ui/Modal";
 import AddCustomerForm from "../customers/AddCustomerForm";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { useDeleteCustomer } from "../customers/useDeleteCustomer";
+import { useMoveBack } from "../../hooks/useMoveBack";
+import { MdDeleteForever, MdModeEdit } from "react-icons/md";
 
 const CustomerDetailRow = styled.div`
   display: flex;
@@ -107,7 +109,7 @@ const TransactionHeader = ({ customerId }) => {
   const location = useLocation();
   const { customerName, customerContact } = location.state || {};
   const { mutate: deleteCustomer, isDeleting } = useDeleteCustomer();
-
+  const moveBack = useMoveBack();
   const totalDebt = allTransactions?.data.reduce((debt, current) => {
     if (current.transactionType === "debt") {
       return (debt = debt + current.amount);
@@ -122,7 +124,7 @@ const TransactionHeader = ({ customerId }) => {
 
   return (
     <CustomerDetailRow $customernamelength={customerName.length}>
-      <HiChevronLeft />
+      <HiChevronLeft onClick={moveBack} style={{ cursor: "pointer" }} />
       <Customer $customernamelength={customerName.length}>
         {capitalizeFirstLetter(customerName)}
         <TotalAmount
@@ -162,10 +164,14 @@ const TransactionHeader = ({ customerId }) => {
           </Modal.Open>
           <Modal.Window name="options-modal">
             <Modal.Open opens="editModal">
-              <div>Edit</div>
+              <div>
+                Edit <MdModeEdit />
+              </div>
             </Modal.Open>
             <Modal.Open opens="deleteModal">
-              <div>Delete</div>
+              <div>
+                Delete <MdDeleteForever />
+              </div>
             </Modal.Open>
             <div>Settings</div>
           </Modal.Window>

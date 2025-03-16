@@ -24,24 +24,36 @@ const StyledConfirmDelete = styled.div`
   }
 `;
 
-function ConfirmDelete({ resourceName, disabled, onConfirm }) {
+function ConfirmDelete({ resourceName, disabled, onConfirm, content, size }) {
   const { close } = useContext(ModalContext);
 
   return (
     <StyledConfirmDelete>
       <Heading as="h3">Delete {capitalizeFirstLetter(resourceName)}</Heading>
       <p>
-        Are you sure you want to delete this{" "}
-        {capitalizeFirstLetter(resourceName)} permanently? This action cannot be
+        {content
+          ? content
+          : `Are you sure you want to delete this
+        ${capitalizeFirstLetter(resourceName)} permanently? This action cannot be
         undone and all the transactions of this customer will be deleted
-        permanently.
+        permanently.`}
       </p>
 
       <div>
-        <Button $variation="secondary" disabled={disabled} onClick={close}>
+        <Button
+          $variation="secondary"
+          size={size}
+          disabled={disabled}
+          onClick={close}
+        >
           Cancel
         </Button>
-        <Button $variation="danger" disabled={disabled} onClick={onConfirm}>
+        <Button
+          $variation="danger"
+          size={size}
+          disabled={disabled}
+          onClick={onConfirm}
+        >
           Delete
         </Button>
       </div>
@@ -53,6 +65,8 @@ ConfirmDelete.propTypes = {
   resourceName: PropTypes.string,
   disabled: PropTypes.bool,
   onConfirm: PropTypes.func,
+  content: PropTypes.string,
+  size: PropTypes.string,
 };
 
 export default ConfirmDelete;

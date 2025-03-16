@@ -7,11 +7,22 @@ import CustomerListFilterSort from "../features/customers/CustomerListFilterSort
 const Customers = () => {
   return (
     <>
-      <Row type="horizontal">
+      <Row
+        type="horizontal"
+        style={{
+          justifyContent: "space-around",
+          backgroundColor: "var(--color-indigo-100)",
+          padding: "0.2rem",
+        }}
+      >
         <Heading as="h2">All Customers</Heading>
         <CustomerListFilterSort />
       </Row>
-      <Row>
+      <Row
+        style={{
+          gap: "0",
+        }}
+      >
         <AllCustomers />
       </Row>
     </>

@@ -136,7 +136,7 @@ const AllTransactions = () => {
     <ScrollBar
       backgroundColor="transparent"
       showButtons={false}
-      height="62dvh"
+      height="calc(100dvh - 300px)"
       ref={scrollBarRef}
     >
       {allTransactions?.data.map((transaction, index, arr) => {

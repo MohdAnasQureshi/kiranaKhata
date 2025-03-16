@@ -44,13 +44,18 @@ const Textarea = styled.textarea`
   border-radius: 20px;
   font-size: 2rem;
   padding: 1rem;
-  border-color: var() (--color-grey-0);
+  border-color: var(--color-grey-400);
   box-shadow: var(--shadow-sm);
   flex-grow: 1; /* Occupies the remaining space */
   width: 70vw;
   height: 5rem;
   min-height: 5rem;
   max-height: 18rem;
+
+  @media (min-width: 1024px) {
+    resize: vertical;
+    height: 15vh;
+  }
 `;
 
 const AddStockList = () => {
@@ -76,6 +81,7 @@ const AddStockList = () => {
   };
 
   const adjustHeight = (textarea) => {
+    if (window.innerWidth > 1024) return;
     textarea.style.height = "5rem"; // Reset height first
     textarea.style.height = `${textarea.scrollHeight}px`; // Then adjust based on content
   };
