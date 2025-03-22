@@ -21,9 +21,9 @@ const CustomerListFilterSort = () => {
       <SortBy
         options={[
           { value: "recent", label: "Most Recent" },
-          { value: "highest-debt", label: "Highest Amount" },
+          { value: "highest-debt", label: "Highest Debt" },
           { value: "oldest", label: "Oldest Customer" },
-          { value: "least-debt", label: "Least Amount" },
+          { value: "least-debt", label: "Least Debt" },
           { value: "name-asc", label: "By Name (A-Z)" },
           { value: "name-desc", label: "By Name (Z-A)" },
         ]}

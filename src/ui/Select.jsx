@@ -107,6 +107,7 @@ const Select = ({ options, onChange, value: currentSortBy }) => {
           style={{
             justifyContent: "center",
             padding: "2rem",
+            boxShadow: "0 4px 5px var(--color-grey-300)",
           }}
         >
           {options.map((option) => (

@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import AddCustomerForm from "../customers/AddCustomerForm";
+import ConfirmDelete from "../../ui/ConfirmDelete";
 import { HiChevronLeft, HiPhone } from "react-icons/hi";
 import { HiChatBubbleOvalLeftEllipsis } from "react-icons/hi2";
 import { IoLogoWhatsapp } from "react-icons/io";
@@ -9,8 +11,6 @@ import { capitalizeFirstLetter, formatCurrency } from "../../utils/helpers";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Modal } from "../../ui/Modal";
-import AddCustomerForm from "../customers/AddCustomerForm";
-import ConfirmDelete from "../../ui/ConfirmDelete";
 import { useDeleteCustomer } from "../customers/useDeleteCustomer";
 import { useMoveBack } from "../../hooks/useMoveBack";
 import { MdDeleteForever, MdModeEdit } from "react-icons/md";

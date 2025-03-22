@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 const SortBy = ({ options }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [appliedSort, setAppliedSort] = useState(
-    localStorage.getItem("appliedSort") || "recent"
+    localStorage.getItem("appliedSort") || "highest-debt"
   );
 
   useEffect(() => {

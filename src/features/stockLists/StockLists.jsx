@@ -1,64 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import ScrollBar from "../../ui/ScrollBar";
 import styled, { css } from "styled-components";
+import toast from "react-hot-toast";
+import ScrollBar from "../../ui/ScrollBar";
 import Spinner from "../../ui/Spinner";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import EditStockList from "./EditStockList";
+import StockListHeader from "./StockListHeader";
 import { formatAndGetDate, formatDate } from "../../utils/helpers";
 import { useStockOrderLists } from "./useStockOrderLists";
 import { useDeleteStockLists } from "./useDeleteStockLists";
 import { MdDeleteForever, MdModeEdit } from "react-icons/md";
-import { HiChevronLeft } from "react-icons/hi";
 import { IoMdCopy } from "react-icons/io";
-import toast from "react-hot-toast";
 import { Modal } from "../../ui/Modal";
-import ConfirmDelete from "../../ui/ConfirmDelete";
-import EditStockList from "./EditStockList";
-import { FiSearch } from "react-icons/fi";
-import Input from "../../ui/Input";
-import { IoClose } from "react-icons/io5";
 import { GoChevronDown } from "react-icons/go";
-
-const StockListsHeader = styled.div`
-  font-size: 2rem;
-  font-weight: 500;
-  padding: 0.4rem;
-  padding-left: 1rem;
-  background-color: var(--color-indigo-100);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  ${({ $showoptions }) =>
-    $showoptions &&
-    css`
-      justify-content: space-between;
-      font-size: 1.8rem;
-      font-weight: 400;
-      padding: 0.5rem;
-    `}
-`;
-
-const ListOptions = styled.div`
-  display: flex;
-  align-items: "center";
-  gap: 1.5rem;
-  margin-right: 1rem;
-
-  & > button {
-    background-color: transparent;
-    border: none;
-    font-size: 2.4rem;
-    padding: 2px;
-    border-radius: 50%;
-    &:active {
-      background: #bbcbff;
-      color: var(--color-brand-500);
-    }
-  }
-  & :focus {
-    outline: none;
-    outline-offset: none;
-  }
-`;
 
 const StockDetails = styled.div`
   display: flex;
@@ -70,10 +24,10 @@ const StockDetails = styled.div`
   color: #000;
   border-radius: 10px;
   border-top-left-radius: 0;
-  padding: 1rem 10rem 1rem 1rem;
+  padding: 1rem 2.5rem 0.8rem 1rem;
   position: relative;
   white-space: pre-wrap;
-
+  max-width: 80vw;
   /* Add translucent blue overlay when selected */
   ${({ selected }) =>
     selected &&
@@ -111,6 +65,7 @@ const DateLabel = styled.div`
   padding: 0.5rem;
   left: 50%;
   top: 115px;
+  z-index: 10;
   transform: translate(-50%, -50%);
 
   @media (min-width: 1024px) {
@@ -136,55 +91,14 @@ const DateLabel2 = styled.div`
   }
 `;
 
-const SearchInput = styled(Input)`
-  border-radius: 50px;
-  border: 1px solid;
-  width: 100%;
-  font-size: 1.5rem;
-  padding: 0.5rem;
-  padding-left: 2rem;
-`;
-
-const SearchWrapper = styled.div`
-  position: relative;
-  padding: 0 15px 0 15px;
-  width: 100%;
-  transition: 0.5s ease;
-`;
-
-const SearchIcon = styled(FiSearch)`
-  color: #464646;
-  font-size: 22px;
-  fill: #ffffff;
-  cursor: pointer;
-`;
-
-const CloseButton = styled(IoClose)`
-  position: absolute;
-  right: 28px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: gray;
-  font-size: 24px;
-  transition: 0.4s ease;
-  cursor: pointer;
-  &:active {
-    color: red;
-  }
-`;
-
 const StockLists = () => {
   const [currentDate, setCurrentDate] = useState("");
   const { isLoading, stockOrderLists } = useStockOrderLists();
   const scrollBarRef = useRef(null);
-
   const today = new Date();
   const yesterday = new Date(Date.now() - 86400000);
-
   const [hoverItemId, setHoverItemId] = useState(null);
-
   const [searchTerm, setSearchTerm] = useState("");
-  const searchInputRef = useRef(null);
   const searchedStocksLists = stockOrderLists?.data.filter((list) =>
     list?.stockList?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -250,7 +164,7 @@ const StockLists = () => {
           longPressTriggered.current = true;
         }
       }
-    }, 400); // Long press time: 200ms
+    }, 400);
   };
 
   // Detect scrolling (Cancel long press if user moves too much)
@@ -265,7 +179,6 @@ const StockLists = () => {
   // Cancel long press if the user lifts their finger before 200ms
   const handleTouchEnd = () => {
     clearTimeout(holdTimer.current);
-
     if (longPressTriggered.current) return;
   };
 
@@ -278,27 +191,12 @@ const StockLists = () => {
   }
 
   const { mutate: deleteStockList, isDeleting } = useDeleteStockLists();
-  const [selectedLength, setSelectedLength] = useState(0);
 
   function deleteStockLists(selectedListsIdsArray) {
     selectedListsIdsArray.forEach((stockListId) =>
       deleteStockList(stockListId)
     );
     setSelectedLists([]);
-  }
-
-  function handleSelectAll(e) {
-    if (e.target.checked) {
-      const allStockListsIdsArray = stockOrderLists?.data?.map(
-        (list) => list._id
-      );
-      setSelectedLists(allStockListsIdsArray);
-      setSelectedLength(allStockListsIdsArray.length);
-    }
-    if (!e.target.checked) {
-      setSelectedLists([]);
-      setSelectedLength(0);
-    }
   }
 
   function handleCopy(listId) {
@@ -335,168 +233,34 @@ const StockLists = () => {
         : window.matchMedia("(pointer: coarse)").matches
     );
   }, []);
-  // console.log(isTouch);
 
-  useEffect(() => {
-    const blockBack = () => {
-      window.history.pushState(null, "", window.location.href);
-    };
-
-    const handleBackButton = (event) => {
-      event.preventDefault();
-      setSelectedLists([]); // Set some state when back is pressed
-      console.log("Back button clicked!");
-    };
-
-    blockBack();
-    window.addEventListener("popstate", handleBackButton);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, [setSelectedLists]);
-
-  const [searchActive, setSearchActive] = useState(false);
   const [showOptions, setShowOptions] = useState("");
-  function handleSearchClose() {
-    setSearchActive(false);
-    setSearchTerm("");
-    setTimeout(() => {
-      scrollBarRef.current?.scrollToBottom();
-    }, 0);
-  }
 
   if (isLoading) return <Spinner />;
   return (
     <>
-      <StockListsHeader
-        $showoptions={selectedLists?.length > 0 ? true : undefined}
-      >
-        {selectedLists?.length > 0 ? (
-          <>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              <HiChevronLeft
-                style={{ cursor: "pointer", fontSize: "2.4rem" }}
-                onClick={() => setSelectedLists([])}
-              />
-              <div style={{ width: "30px", textAlign: "center" }}>
-                {selectedLists?.length}
-              </div>
-              <input
-                type="checkbox"
-                id="select-all"
-                onChange={(e) => handleSelectAll(e)}
-                checked={selectedLength === selectedLists.length}
-                style={{ width: "14px", height: "14px" }}
-              />
-              <label htmlFor="select-all">Select all</label>
-            </div>
-            <ListOptions>
-              {selectedLists.length === 1 ? (
-                <Modal>
-                  <Modal.Open opens="edit-list">
-                    <button>
-                      <MdModeEdit />
-                    </button>
-                  </Modal.Open>
+      <StockListHeader
+        selectedLists={selectedLists}
+        setSelectedLists={setSelectedLists}
+        stockOrderLists={stockOrderLists}
+        handleCopy={handleCopy}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        scrollBarRef={scrollBarRef}
+        deleteStockLists={deleteStockLists}
+        isDeleting={isDeleting}
+      />
 
-                  <Modal.Window
-                    name="edit-list"
-                    style={{
-                      width: "84vw",
-                      height: "60vh",
-                      top: "45%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      justifyContent: "center",
-                      padding: "2rem",
-                    }}
-                    overlayStyle={{
-                      backgroundColor: "var(--backdrop-color)",
-                    }}
-                    showCloseBtn={true}
-                  >
-                    <EditStockList
-                      stockOrderLists={stockOrderLists}
-                      selectedLists={selectedLists}
-                      setSelectedLists={setSelectedLists}
-                    />
-                  </Modal.Window>
-                </Modal>
-              ) : (
-                ""
-              )}
-              <Modal>
-                <Modal.Open opens="delete-modal">
-                  <button>
-                    <MdDeleteForever />
-                  </button>
-                </Modal.Open>
-                <Modal.Window
-                  name="delete-modal"
-                  style={{
-                    width: "84vw",
-                    height: "35vh",
-                    top: "45%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    justifyContent: "center",
-                    padding: "2rem",
-                  }}
-                  overlayStyle={{
-                    backgroundColor: "var(--backdrop-color)",
-                  }}
-                  showCloseBtn={true}
-                >
-                  <ConfirmDelete
-                    onConfirm={() => deleteStockLists(selectedLists)}
-                    disabled={isDeleting}
-                    content="Are you sure you want to delete it permanently ?"
-                    size="medium"
-                  />
-                </Modal.Window>
-              </Modal>
+      {currentDate && (
+        <DateLabel>
+          {currentDate === formatAndGetDate(today)
+            ? `Today, ${currentDate}`
+            : currentDate === formatAndGetDate(yesterday)
+              ? `Yesterday, ${currentDate}`
+              : currentDate}
+        </DateLabel>
+      )}
 
-              <button onClick={handleCopy}>
-                <IoMdCopy />
-              </button>
-            </ListOptions>
-          </>
-        ) : searchActive ? (
-          <SearchWrapper>
-            <SearchInput
-              ref={searchInputRef}
-              id="search"
-              type="text"
-              placeholder="Search stock lists..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <CloseButton onClick={handleSearchClose} />
-          </SearchWrapper>
-        ) : (
-          <div>
-            All Stocks Lists [{stockOrderLists?.data.length}]
-            <span
-              style={{ position: "absolute", right: "1.5rem", top: "0.7rem" }}
-              onClick={() => {
-                setSearchActive(true);
-                setTimeout(() => {
-                  searchInputRef.current?.focus(); // Auto-focus after state update
-                }, 0);
-              }}
-            >
-              <SearchIcon />
-            </span>
-          </div>
-        )}
-      </StockListsHeader>
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
@@ -514,15 +278,6 @@ const StockLists = () => {
 
           return (
             <React.Fragment key={list._id}>
-              {currentDate && (
-                <DateLabel>
-                  {currentDate === formatAndGetDate(today)
-                    ? `Today, ${currentDate}`
-                    : currentDate === formatAndGetDate(yesterday)
-                      ? `Yesterday, ${currentDate}`
-                      : currentDate}
-                </DateLabel>
-              )}
               {isNewDate && (
                 <DateLabel2>
                   {currentFormattedDate === formatAndGetDate(today)
@@ -557,7 +312,7 @@ const StockLists = () => {
                   }}
                 >
                   {formatDate(list.createdAt)}
-                </span>{" "}
+                </span>
                 {!isTouch && hoverItemId === list._id && (
                   <>
                     <div
@@ -606,7 +361,7 @@ const StockLists = () => {
                       >
                         <Modal>
                           <Modal.Open opens="delete-modal">
-                            <MdDeleteForever style={{ cursor: "pointer" }} />
+                            <DeleteListButton />
                           </Modal.Open>
                           <Modal.Window
                             name="delete-modal"
@@ -633,14 +388,11 @@ const StockLists = () => {
                           </Modal.Window>
                         </Modal>
 
-                        <IoMdCopy
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleCopy(list._id)}
-                        />
+                        <CopyListButton onClick={() => handleCopy(list._id)} />
 
                         <Modal>
                           <Modal.Open opens="edit-list">
-                            <MdModeEdit style={{ cursor: "pointer" }} />
+                            <EditListButton />
                           </Modal.Open>
 
                           <Modal.Window
@@ -678,5 +430,24 @@ const StockLists = () => {
     </>
   );
 };
+
+const DeleteListButton = styled(MdDeleteForever)`
+  cursor: pointer;
+  &:hover {
+    color: var(--color-brand-700);
+  }
+`;
+const EditListButton = styled(MdModeEdit)`
+  cursor: pointer;
+  &:hover {
+    color: var(--color-brand-700);
+  }
+`;
+const CopyListButton = styled(IoMdCopy)`
+  cursor: pointer;
+  &:hover {
+    color: var(--color-brand-700);
+  }
+`;
 
 export default StockLists;

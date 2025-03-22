@@ -10,6 +10,7 @@ import Button from "../../ui/Button";
 import { useAddTransaction } from "./useAddTransaction";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
+import { TransactionProvider } from "../../contexts/TransactionContext";
 
 const TransactionForm = styled(Form)`
   display: grid;
@@ -133,7 +134,10 @@ const AddTransactionForm = () => {
   return (
     <>
       <TransactionHeader customerId={customerId} />
-      <AllTransactions />
+      <TransactionProvider>
+        <AllTransactions />
+      </TransactionProvider>
+
       <TransactionForm onSubmit={handleSubmit(onAddTransaction)}>
         <FormRow>
           <Input

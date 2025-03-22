@@ -9,8 +9,10 @@ export function useTransactions(customerId) {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ["transactions"],
+    queryKey: ["transactions", customerId],
     queryFn: () => getAllTransactions(customerId),
+    enabled: !!customerId, // Prevents fetching if customerId is undefined
+    staleTime: 1000 * 60 * 5,
   });
 
   return {

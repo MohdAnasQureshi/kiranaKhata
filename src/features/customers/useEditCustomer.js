@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { editCustomer } from "../../services/apiCustomers";
+import toast from "react-hot-toast";
 
 export function useEditCustomer(setServerErrorMessage, close) {
   const queryClient = useQueryClient();
