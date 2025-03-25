@@ -35,3 +35,42 @@ export async function getAllTransactions(customerId) {
   }
   return data;
 }
+
+export async function editTransaction(
+  editedTransaction,
+  customerId,
+  transactionId
+) {
+  const { data, error } = await axios.put(
+    `http://192.168.1.20:8000/api/v1/shopOwners/transactions/edit-transaction/${customerId}/${transactionId}`,
+    editedTransaction,
+    {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+    }
+  );
+
+  if (error) {
+    console.error(error.request.response);
+    throw new Error("Transaction cannot be edited");
+  }
+  return data;
+}
+
+export async function deleteTransaction(customerId, transactionId) {
+  const { data, error } = await axios.delete(
+    `http://192.168.1.20:8000/api/v1/shopOwners/transactions/delete-transaction/${customerId}/${transactionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+    }
+  );
+
+  if (error) {
+    console.error(error.request.response);
+    throw new Error("Transaction cannot be deleted");
+  }
+  return data;
+}

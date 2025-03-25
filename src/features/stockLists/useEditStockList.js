@@ -10,6 +10,10 @@ export function useEditStockList(stockListId) {
     onSuccess: () => {
       toast.success("Stock List edited successfully");
       queryClient.invalidateQueries({ queryKey: ["stockorderlists"] });
+      console.log(
+        "Cached data:",
+        queryClient.getQueryData(["stockorderlists"])
+      );
     },
     onError: (err) => toast.error("Stock list cannot be edited", err.message),
   });

@@ -39,7 +39,7 @@ const AllTransactions = () => {
     if (allTransactions) {
       scrollBarRef.current?.scrollToBottom();
     }
-  }, [allTransactions?.data.length]);
+  }, [allTransactions?.data]);
 
   useEffect(() => {
     const container = scrollBarRef.current?.getContentRef();
@@ -76,7 +76,7 @@ const AllTransactions = () => {
     return () => {
       observer.disconnect();
     };
-  }, [allTransactions?.data.length]);
+  }, [allTransactions?.data]);
 
   const transactionsList = useMemo(() => {
     if (!allTransactions?.data.length) return null;
@@ -97,7 +97,7 @@ const AllTransactions = () => {
         />
       );
     });
-  }, [allTransactions?.data.length]);
+  }, [allTransactions?.data]);
 
   if (isLoading) return <Spinner />;
   if (error) return <div>Error: {error.message}</div>;

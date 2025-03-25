@@ -113,7 +113,7 @@ const StockListHeader = ({
 
     const handleBackButton = (event) => {
       event.preventDefault();
-      setSelectedLists([]); // Set some state when back is pressed
+      setSelectedLists([]);
       console.log("Back button clicked!");
     };
 

@@ -87,7 +87,6 @@ const TransactionDetail = ({
   const touchStartY = useRef(0);
   const isScrolling = useRef(false);
   const longPressTriggered = useRef(false);
-
   const handleTouchStart = useCallback(
     (e) => {
       touchStartY.current = e.touches[0].clientY;

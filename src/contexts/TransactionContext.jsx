@@ -12,6 +12,9 @@ const transactionReducer = (state, action) => {
         ? state.filter((id) => id !== action.payload) // Remove if already selected
         : [...state, action.payload]; // Add if not selected
 
+    case "SELECT_ALL_TRANSACTIONS":
+      return action.payload;
+
     case "CLEAR_SELECTION":
       return [];
 

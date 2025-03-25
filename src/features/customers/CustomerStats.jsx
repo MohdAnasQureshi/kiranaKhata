@@ -133,6 +133,7 @@ const CustomerStats = ({
         <StatsContainer $hide={searchTerm.length > 0}>
           <StyledCustomerStats>
             <p
+              style={{ width: "50vw" }}
               onClick={() =>
                 handleRowClick(customerWithHighestDebt._id, {
                   customerName: customerWithHighestDebt.customerName,
@@ -140,7 +141,7 @@ const CustomerStats = ({
                 })
               }
             >
-              Highest Debtor :{" "}
+              Highest Debt :{" "}
               {capitalizeFirstLetter(customerWithHighestDebt.customerName)} (
               {formatCurrency(customerWithHighestDebt.totalOutstandingDebt)})
               <FaAngleRight
@@ -152,6 +153,7 @@ const CustomerStats = ({
               />
             </p>
             <p
+              style={{ width: "50vw" }}
               onClick={() =>
                 handleRowClick(oldestCustomerWithUnpaidDebt._id, {
                   customerName: oldestCustomerWithUnpaidDebt.customerName,
@@ -159,7 +161,7 @@ const CustomerStats = ({
                 })
               }
             >
-              Oldest debtor :{" "}
+              Oldest debt :{" "}
               {capitalizeFirstLetter(
                 oldestCustomerWithUnpaidDebt?.customerName
               )}

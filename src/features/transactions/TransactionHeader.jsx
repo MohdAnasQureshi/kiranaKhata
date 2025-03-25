@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import AddCustomerForm from "../customers/AddCustomerForm";
@@ -12,10 +12,14 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Modal } from "../../ui/Modal";
 import { useDeleteCustomer } from "../customers/useDeleteCustomer";
-import { useMoveBack } from "../../hooks/useMoveBack";
 import { MdDeleteForever, MdModeEdit } from "react-icons/md";
+import TransactionHeaderActions from "./TransactionHeaderActions";
+import {
+  useSelectedTransactions,
+  useTransactionDispatch,
+} from "../../contexts/TransactionContext";
 
-const CustomerDetailRow = styled.div`
+const StyledTransactionHeader = styled.div`
   display: flex;
   align-items: center;
   padding: 10px 5px;
@@ -52,7 +56,7 @@ const Customer = styled.div`
   gap: 1rem;
   align-items: center;
   font-size: ${({ $customernamelength }) => {
-    return $customernamelength > 10 ? "1.6rem" : "2rem";
+    return $customernamelength > 10 ? "1.9rem" : "2rem";
   }};
 `;
 
@@ -65,9 +69,11 @@ const CustomerContacts = styled.div`
 
 const TotalAmount = styled.span`
   font-size: ${({ $customernamelength }) => {
-    return $customernamelength > 10 ? "1.2rem" : "1.4rem";
+    return $customernamelength > 10 ? "1.7rem" : "1.8rem";
   }};
   color: ${({ $totaldebt }) => ($totaldebt >= 0 ? "red" : "green")};
+  font-weight: 600;
+  padding-left: 3px;
 `;
 
 const Link = styled.a`
@@ -109,12 +115,31 @@ const TransactionHeader = ({ customerId }) => {
   const location = useLocation();
   const { customerName, customerContact } = location.state || {};
   const { mutate: deleteCustomer, isDeleting } = useDeleteCustomer();
-  const moveBack = useMoveBack();
+  const selectedTransactions = useSelectedTransactions();
+  const dispatch = useTransactionDispatch();
   const totalDebt = allTransactions?.data.reduce((debt, current) => {
     if (current.transactionType === "debt") {
       return (debt = debt + current.amount);
     } else return (debt = debt - current.amount);
   }, 0);
+
+  const moveBack = () => {
+    navigate(`/customers`);
+  };
+
+  useEffect(() => {
+    const handleBackButton = (event) => {
+      event.preventDefault();
+      if (selectedTransactions.length > 0)
+        dispatch({ type: "CLEAR_SELECTION" });
+      else navigate("/");
+    };
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [navigate, dispatch]);
 
   function onDeleteCustomer() {
     deleteCustomer(customerId, {
@@ -123,105 +148,111 @@ const TransactionHeader = ({ customerId }) => {
   }
 
   return (
-    <CustomerDetailRow $customernamelength={customerName.length}>
-      <HiChevronLeft onClick={moveBack} style={{ cursor: "pointer" }} />
-      <Customer $customernamelength={customerName.length}>
-        {capitalizeFirstLetter(customerName)}
-        <TotalAmount
-          $totaldebt={totalDebt}
-          $customernamelength={customerName.length}
-        >
-          {isFetching
-            ? ""
-            : totalDebt >= 0
-              ? `debt: ${formatCurrency(totalDebt)}`
-              : `deposit: ${formatCurrency(Math.abs(totalDebt))}`}
-        </TotalAmount>
-      </Customer>
-      <CustomerContacts>
-        <Link
-          href={`https://wa.me/${customerContact}?text=${encodeURIComponent(`Dear customer payment of Rs ${totalDebt} is pending to be paid at shopOwner. Please pay the due amount as early as possible. Click this link to download the detailed bill. `)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <IoLogoWhatsapp />
-        </Link>
-
-        <Link
-          href={`sms:${customerContact}?body=${encodeURIComponent(`Dear customer payment of Rs ${totalDebt} is pending to be paid at shopOwner. Please pay the due amount as early as possible.`)}`}
-        >
-          <HiChatBubbleOvalLeftEllipsis />
-        </Link>
-
-        <Link href={`tel:${customerContact}`}>
-          <HiPhone />
-        </Link>
-        <Modal>
-          <Modal.Open opens="options-modal">
-            <Link as="div">
-              <BsThreeDotsVertical />
+    <StyledTransactionHeader $customernamelength={customerName.length}>
+      {selectedTransactions.length === 0 ? (
+        <>
+          <HiChevronLeft onClick={moveBack} style={{ cursor: "pointer" }} />
+          <Customer $customernamelength={customerName.length}>
+            {capitalizeFirstLetter(customerName)}
+            <TotalAmount
+              $totaldebt={totalDebt}
+              $customernamelength={customerName.length}
+            >
+              {isFetching
+                ? ""
+                : totalDebt >= 0
+                  ? `${formatCurrency(totalDebt)}`
+                  : `${formatCurrency(Math.abs(totalDebt))}`}
+            </TotalAmount>
+          </Customer>
+          <CustomerContacts>
+            <Link
+              href={`https://wa.me/${customerContact}?text=${encodeURIComponent(`Dear customer payment of Rs ${Math.abs(totalDebt)} is ${totalDebt < 0 ? "deposited to the shop owner" : " pending to be paid at {shopOwner}. Please pay the due amount as early as possible. Click this link to download the detailed bill. "} `)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IoLogoWhatsapp />
             </Link>
-          </Modal.Open>
-          <Modal.Window name="options-modal">
-            <Modal.Open opens="editModal">
-              <div>
-                Edit <MdModeEdit />
-              </div>
-            </Modal.Open>
-            <Modal.Open opens="deleteModal">
-              <div>
-                Delete <MdDeleteForever />
-              </div>
-            </Modal.Open>
-            <div>Settings</div>
-          </Modal.Window>
 
-          <Modal.Window
-            name="editModal"
-            style={{
-              width: "84vw",
-              height: "55vh",
-              top: "45%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              justifyContent: "center",
-              padding: "2rem",
-            }}
-            overlayStyle={{
-              backgroundColor: "var(--backdrop-color)",
-            }}
-            showCloseBtn={true}
-          >
-            <AddCustomerForm
-              customerToEdit={{ customerId, customerContact, customerName }}
-            />
-          </Modal.Window>
+            <Link
+              href={`sms:${customerContact}?body=${encodeURIComponent(`Dear customer payment of Rs ${Math.abs(totalDebt)} is ${totalDebt < 0 ? "deposited to the shop owner" : " pending to be paid at {shopOwner}. Please pay the due amount as early as possible. Click this link to download the detailed bill. "} `)}`}
+            >
+              <HiChatBubbleOvalLeftEllipsis />
+            </Link>
 
-          <Modal.Window
-            name="deleteModal"
-            style={{
-              width: "84vw",
-              height: "50vh",
-              top: "45%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              justifyContent: "center",
-              padding: "2rem",
-            }}
-            overlayStyle={{
-              backgroundColor: "var(--backdrop-color)",
-            }}
-            showCloseBtn={true}
-          >
-            <ConfirmDelete
-              disabled={isDeleting}
-              resourceName={customerName}
-              onConfirm={onDeleteCustomer}
-            />
-          </Modal.Window>
-        </Modal>
-      </CustomerContacts>
-    </CustomerDetailRow>
+            <Link href={`tel:${customerContact}`}>
+              <HiPhone />
+            </Link>
+            <Modal>
+              <Modal.Open opens="options-modal">
+                <Link as="div">
+                  <BsThreeDotsVertical />
+                </Link>
+              </Modal.Open>
+              <Modal.Window name="options-modal">
+                <Modal.Open opens="editModal">
+                  <div>
+                    Edit <MdModeEdit />
+                  </div>
+                </Modal.Open>
+                <Modal.Open opens="deleteModal">
+                  <div>
+                    Delete <MdDeleteForever />
+                  </div>
+                </Modal.Open>
+                <div>Settings</div>
+              </Modal.Window>
+
+              <Modal.Window
+                name="editModal"
+                style={{
+                  width: "84vw",
+                  height: "55vh",
+                  top: "45%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  justifyContent: "center",
+                  padding: "2rem",
+                }}
+                overlayStyle={{
+                  backgroundColor: "var(--backdrop-color)",
+                }}
+                showCloseBtn={true}
+              >
+                <AddCustomerForm
+                  customerToEdit={{ customerId, customerContact, customerName }}
+                />
+              </Modal.Window>
+
+              <Modal.Window
+                name="deleteModal"
+                style={{
+                  width: "84vw",
+                  height: "50vh",
+                  top: "45%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  justifyContent: "center",
+                  padding: "2rem",
+                }}
+                overlayStyle={{
+                  backgroundColor: "var(--backdrop-color)",
+                }}
+                showCloseBtn={true}
+              >
+                <ConfirmDelete
+                  disabled={isDeleting}
+                  resourceName={customerName}
+                  onConfirm={onDeleteCustomer}
+                />
+              </Modal.Window>
+            </Modal>
+          </CustomerContacts>
+        </>
+      ) : (
+        <TransactionHeaderActions allTransactions={allTransactions} />
+      )}
+    </StyledTransactionHeader>
   );
 };
 
