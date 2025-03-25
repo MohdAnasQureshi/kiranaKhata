@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import AddCustomerForm from "../customers/AddCustomerForm";
@@ -14,10 +14,7 @@ import { Modal } from "../../ui/Modal";
 import { useDeleteCustomer } from "../customers/useDeleteCustomer";
 import { MdDeleteForever, MdModeEdit } from "react-icons/md";
 import TransactionHeaderActions from "./TransactionHeaderActions";
-import {
-  useSelectedTransactions,
-  useTransactionDispatch,
-} from "../../contexts/TransactionContext";
+import { useSelectedTransactions } from "../../contexts/TransactionContext";
 
 const StyledTransactionHeader = styled.div`
   display: flex;
@@ -116,7 +113,6 @@ const TransactionHeader = ({ customerId }) => {
   const { customerName, customerContact } = location.state || {};
   const { mutate: deleteCustomer, isDeleting } = useDeleteCustomer();
   const selectedTransactions = useSelectedTransactions();
-  const dispatch = useTransactionDispatch();
   const totalDebt = allTransactions?.data.reduce((debt, current) => {
     if (current.transactionType === "debt") {
       return (debt = debt + current.amount);
@@ -126,20 +122,6 @@ const TransactionHeader = ({ customerId }) => {
   const moveBack = () => {
     navigate(`/customers`);
   };
-
-  useEffect(() => {
-    const handleBackButton = (event) => {
-      event.preventDefault();
-      if (selectedTransactions.length > 0)
-        dispatch({ type: "CLEAR_SELECTION" });
-      else navigate("/");
-    };
-    window.addEventListener("popstate", handleBackButton);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, [navigate, dispatch]);
 
   function onDeleteCustomer() {
     deleteCustomer(customerId, {

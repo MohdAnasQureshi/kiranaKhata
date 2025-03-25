@@ -10,10 +10,13 @@ import Button from "../../ui/Button";
 import PropTypes from "prop-types";
 import { useAddTransaction } from "./useAddTransaction";
 import { useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEditTransaction } from "./useEditTransaction";
 import { ModalContext } from "../../ui/Modal";
-import { useTransactionDispatch } from "../../contexts/TransactionContext";
+import {
+  useSelectedTransactions,
+  useTransactionDispatch,
+} from "../../contexts/TransactionContext";
 
 const TransactionForm = styled(Form)`
   display: grid;
@@ -59,7 +62,6 @@ const FormRow = styled.div`
   &:nth-child(1) {
     grid-column-start: 1;
     grid-column-end: 2;
-    justify-content: center;
   }
   &:nth-child(2) {
     grid-column-start: 2;
@@ -124,6 +126,8 @@ const AddTransactionForm = ({ transactionToEdit = {} }) => {
   );
   const { close } = useContext(ModalContext) || {};
   const dispatch = useTransactionDispatch();
+  const selectedTransactions = useSelectedTransactions();
+  const navigate = useNavigate();
   useEffect(() => {
     // Retrieve data from localStorage
     const amount = localStorage.getItem(`amount_${customerId}`);
@@ -135,6 +139,29 @@ const AddTransactionForm = ({ transactionToEdit = {} }) => {
     if (amount) setValue("amount", amount);
     if (transactionDetails) setValue("transactionDetails", transactionDetails);
   }, [setValue]);
+
+  useEffect(() => {
+    const blockBack = () => {
+      const prevState = window.history.state; // Get the existing state
+      window.history.pushState(prevState, "", window.location.href);
+    };
+
+    const handleBackButton = (event) => {
+      event.preventDefault();
+      if (selectedTransactions.length > 0) {
+        dispatch({ type: "CLEAR_SELECTION" });
+      }
+      if (selectedTransactions.length === 0) navigate("/customers");
+    };
+    if (selectedTransactions.length > 0) {
+      blockBack();
+    }
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [selectedTransactions, navigate]);
 
   function onAddTransaction(data) {
     if (!customerId) {

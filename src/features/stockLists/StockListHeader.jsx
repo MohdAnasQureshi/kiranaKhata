@@ -114,7 +114,6 @@ const StockListHeader = ({
     const handleBackButton = (event) => {
       event.preventDefault();
       setSelectedLists([]);
-      console.log("Back button clicked!");
     };
 
     blockBack();

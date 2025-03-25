@@ -12,6 +12,7 @@ import {
 import { useCustomers } from "./useCustomers";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaAngleRight } from "react-icons/fa";
+import AddCustomerAnimation from "../../ui/AddAnimation";
 
 const CustomerDetailRow = styled.div`
   display: flex;
@@ -124,10 +125,9 @@ const AllCustomers = () => {
 
   if (customers?.data.length === 0 || !customers)
     return (
-      <div>
-        <p>No Customers Found !!</p>{" "}
-        <p>Click Add Customer to add new customer</p>{" "}
-      </div>
+      <AddCustomerAnimation bigscreen={true}>
+        Click to Add New Customer
+      </AddCustomerAnimation>
     );
 
   return (

@@ -27,7 +27,6 @@ const StatsContainer = styled.div`
 
 const StyledCustomerStats = styled.div`
   display: flex;
-  align-items: center;
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--color-grey-100);
   border-bottom: 1px solid var(--color-grey-200);
@@ -36,9 +35,9 @@ const StyledCustomerStats = styled.div`
   background-color: var(--color-silver-100);
   font-size: 1.4rem;
   font-weight: 600;
+  gap: 0.5rem;
   justify-content: space-around;
-  gap: 1rem;
-  padding: 1rem;
+  padding: 0.5rem 1rem 0.5rem 1rem;
   margin: 0 0.8rem 0 0.8rem;
   cursor: pointer;
 `;
@@ -56,6 +55,7 @@ const SearchWrapper = styled.div`
   width: 100%;
   transition: 0.5s ease;
   margin-top: 0.8rem;
+  margin-bottom: 0.2rem;
 `;
 
 const SearchIcon = styled(FiSearch)`
@@ -86,6 +86,7 @@ const TotalCustomers = styled.div`
   padding-top: 0.6rem;
   font-size: 1.4rem;
   margin: auto;
+  margin-bottom: 0.2rem;
 `;
 
 const CustomerStats = ({
@@ -133,7 +134,6 @@ const CustomerStats = ({
         <StatsContainer $hide={searchTerm.length > 0}>
           <StyledCustomerStats>
             <p
-              style={{ width: "50vw" }}
               onClick={() =>
                 handleRowClick(customerWithHighestDebt._id, {
                   customerName: customerWithHighestDebt.customerName,
@@ -153,7 +153,6 @@ const CustomerStats = ({
               />
             </p>
             <p
-              style={{ width: "50vw" }}
               onClick={() =>
                 handleRowClick(oldestCustomerWithUnpaidDebt._id, {
                   customerName: oldestCustomerWithUnpaidDebt.customerName,

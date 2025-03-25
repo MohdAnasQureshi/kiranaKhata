@@ -10,9 +10,9 @@ const Customers = () => {
       <Row
         type="horizontal"
         style={{
-          justifyContent: "space-around",
+          justifyContent: "space-between",
           backgroundColor: "var(--color-indigo-100)",
-          padding: "0.2rem",
+          padding: "0.2rem 1rem 0.2rem 1rem",
         }}
       >
         <Heading as="h2">All Customers</Heading>

@@ -6,6 +6,7 @@ import Spinner from "../../ui/Spinner";
 import { useParams } from "react-router-dom";
 import { useTransactions } from "./useTransactions";
 import { formatAndGetDate } from "../../utils/helpers";
+import AddTransactionAnimation from "../../ui/AddAnimation";
 
 const DateLabel = styled.div`
   font-size: 1.5rem;
@@ -102,7 +103,11 @@ const AllTransactions = () => {
   if (isLoading) return <Spinner />;
   if (error) return <div>Error: {error.message}</div>;
   if (allTransactions?.data?.length === 0) {
-    return <div>No transactions found for this customer.</div>;
+    return (
+      <AddTransactionAnimation bottom="180px" bigscreen={false}>
+        Add New Transaction Here
+      </AddTransactionAnimation>
+    );
   }
   return (
     <ScrollBar

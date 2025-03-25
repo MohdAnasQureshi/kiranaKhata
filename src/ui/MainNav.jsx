@@ -5,6 +5,7 @@ import { HiOutlineUserPlus, HiOutlineUsers } from "react-icons/hi2";
 import { HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import { AiOutlineHome } from "react-icons/ai";
 import { IoSettingsOutline } from "react-icons/io5";
+
 const NavList = styled.ul`
   display: flex;
   flex-direction: row;

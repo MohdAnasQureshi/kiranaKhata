@@ -13,6 +13,7 @@ import { MdDeleteForever, MdModeEdit } from "react-icons/md";
 import { IoMdCopy } from "react-icons/io";
 import { Modal } from "../../ui/Modal";
 import { GoChevronDown } from "react-icons/go";
+import AddAnimation from "../../ui/AddAnimation";
 
 const StockDetails = styled.div`
   display: flex;
@@ -237,6 +238,7 @@ const StockLists = () => {
   const [showOptions, setShowOptions] = useState("");
 
   if (isLoading) return <Spinner />;
+
   return (
     <>
       <StockListHeader
@@ -267,7 +269,12 @@ const StockLists = () => {
         height="calc(100dvh - 240px)"
         ref={scrollBarRef}
       >
-        {searchedStocksLists.length === 0 ? "No Stock List found!!" : ""}
+        {stockOrderLists?.data.length === 0 ? (
+          <AddAnimation bottom="145px" bigscreen={false}>
+            Add New Stock List Here
+          </AddAnimation>
+        ) : null}
+        {searchedStocksLists.length === 0 ? "No Stock List found !" : ""}
         {searchedStocksLists?.map((list, index, arr) => {
           const currentFormattedDate = formatAndGetDate(list.createdAt);
           const previousFormattedDate =

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { HiChevronLeft } from "react-icons/hi2";
 import { Modal } from "../../ui/Modal";
 import { MdDeleteForever, MdModeEdit } from "react-icons/md";
@@ -48,25 +48,6 @@ const TransactionHeaderActions = ({ allTransactions }) => {
     )[0] || {};
 
   const { mutate, isDeleting } = useDeleteTransaction(customerId);
-
-  useEffect(() => {
-    const blockBack = () => {
-      const prevState = window.history.state; // Get the existing state
-      window.history.pushState(prevState, "", window.location.href);
-    };
-
-    const handleBackButton = (event) => {
-      event.preventDefault();
-      dispatch({ type: "CLEAR_SELECTION" });
-    };
-
-    blockBack();
-    window.addEventListener("popstate", handleBackButton);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, [dispatch]);
 
   function handleSelectAll(e) {
     if (e.target.checked) {
