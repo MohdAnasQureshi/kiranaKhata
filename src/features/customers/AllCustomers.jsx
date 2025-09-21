@@ -143,7 +143,7 @@ const AllCustomers = () => {
       <ScrollBar
         backgroundColor="transparent"
         showButtons={false}
-        height="calc(100dvh - 340px)"
+        height="calc(100dvh - 300px)"
       >
         {sortedCustomers?.length === 0 ? (
           <div>No Customer found!</div>

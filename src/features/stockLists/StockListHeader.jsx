@@ -16,7 +16,7 @@ const StyledStockListsHeader = styled.div`
   font-weight: 500;
   padding: 0.4rem;
   padding-left: 1rem;
-  background-color: var(--color-indigo-100);
+  background-color: var(--color-brand-50);
   display: flex;
   flex-direction: row;
   align-items: center;

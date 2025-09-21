@@ -15,6 +15,8 @@ import { useDeleteCustomer } from "../customers/useDeleteCustomer";
 import { MdDeleteForever, MdModeEdit } from "react-icons/md";
 import TransactionHeaderActions from "./TransactionHeaderActions";
 import { useSelectedTransactions } from "../../contexts/TransactionContext";
+import { BiSolidMessageSquareDetail } from "react-icons/bi";
+import Button from "../../ui/Button";
 
 const StyledTransactionHeader = styled.div`
   display: flex;
@@ -182,7 +184,11 @@ const TransactionHeader = ({ customerId }) => {
                     Delete <MdDeleteForever />
                   </div>
                 </Modal.Open>
-                <div>Settings</div>
+                <Modal.Open opens="detailsModal">
+                  <div>
+                    Details <BiSolidMessageSquareDetail />
+                  </div>
+                </Modal.Open>
               </Modal.Window>
 
               <Modal.Window
@@ -227,6 +233,51 @@ const TransactionHeader = ({ customerId }) => {
                   resourceName={customerName}
                   onConfirm={onDeleteCustomer}
                 />
+              </Modal.Window>
+
+              <Modal.Window
+                name="detailsModal"
+                style={{
+                  width: "84vw",
+                  height: "60vh",
+                  top: "45%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  justifyContent: "center",
+                  padding: "2rem",
+                }}
+                overlayStyle={{
+                  backgroundColor: "var(--backdrop-color)",
+                }}
+                showCloseBtn={true}
+              >
+                <AddCustomerForm
+                  customerToEdit={{ customerId, customerContact, customerName }}
+                />
+                <div
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "500",
+                    fontSize: "20px",
+                  }}
+                >
+                  or
+                </div>
+                <Modal.Open opens="deleteModal">
+                  <Button
+                    $variation="danger"
+                    size={15}
+                    style={{
+                      height: "4.8rem",
+                      marginLeft: "4rem",
+                      marginRight: "4rem",
+                      marginTop: "3rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    Delete Customer
+                  </Button>
+                </Modal.Open>
               </Modal.Window>
             </Modal>
           </CustomerContacts>

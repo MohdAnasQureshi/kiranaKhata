@@ -1,13 +1,10 @@
 import axios from "axios";
-import ACCESS_TOKEN from "../../constants";
 
 export async function getCustomers() {
   const { data, error } = await axios.get(
     "http://192.168.1.20:8000/api/v1/shopOwners/customers/customers-list",
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
   if (error) {
@@ -23,9 +20,7 @@ export async function addCustomer(customer) {
     `http://192.168.1.20:8000/api/v1/shopOwners/customers/add-customer`,
     customer,
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
 
@@ -40,9 +35,7 @@ export async function deleteCustomer(customerId) {
   const { data, error } = await axios.delete(
     `http://192.168.1.20:8000/api/v1/shopOwners/customers/delete-customer/${customerId}`,
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
   if (error) {
@@ -57,9 +50,7 @@ export async function editCustomer(customer, customerId) {
     `http://192.168.1.20:8000/api/v1/shopOwners/customers/edit-customer/${customerId}`,
     customer,
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
 

@@ -11,7 +11,7 @@ const Customers = () => {
         type="horizontal"
         style={{
           justifyContent: "space-between",
-          backgroundColor: "var(--color-indigo-100)",
+          backgroundColor: "var(--color-brand-50)",
           padding: "0.2rem 1rem 0.2rem 1rem",
         }}
       >

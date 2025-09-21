@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Input from "../../ui/Input";
 import PropTypes from "prop-types";
 import { FiSearch } from "react-icons/fi";
@@ -11,6 +11,44 @@ import {
 } from "../../utils/helpers";
 import { FaAngleRight } from "react-icons/fa";
 
+// const StatsContainer = styled.div`
+//   transition:
+//     opacity 0.6s ease,
+//     transform 0.6s ease,
+//     max-height 0.6s ease,
+//     margin 0.6s ease;
+//   opacity: ${(props) => (props.$hide ? 0 : 1)};
+//   transform: ${(props) =>
+//     props.$hide ? "translateY(-10px)" : "translateY(0)"};
+//   max-height: ${(props) =>
+//     props.$hide ? "0px" : "200px"}; /* Smooth collapse */
+//   overflow: hidden;
+//   width: 100%;
+// `;
+
+// const marquee = keyframes`
+//   0% { transform: translateX(100%);}
+//   100% { transform: translateX(-100%);}
+// `;
+
+// const StyledCustomerStats = styled.div`
+//   display: flex;
+//   border-radius: var(--border-radius-lg);
+//   border: 1px solid var(--color-grey-100);
+//   border-bottom: 1px solid var(--color-grey-200);
+//   box-shadow: 0 3px 8px var(--color-grey-100);
+//   flex-direction: row;
+//   background-color: var(--color-silver-100);
+//   font-size: 1.4rem;
+//   font-weight: 600;
+//   gap: 0.5rem;
+//   align-items: center;
+//   padding: 0.5rem 1rem 0.5rem 1rem;
+//   margin: 0 0.8rem 0 0.8rem;
+//   cursor: pointer;
+//   animation: ${marquee} 12s linear infinite;
+// `;
+
 const StatsContainer = styled.div`
   transition:
     opacity 0.6s ease,
@@ -20,26 +58,67 @@ const StatsContainer = styled.div`
   opacity: ${(props) => (props.$hide ? 0 : 1)};
   transform: ${(props) =>
     props.$hide ? "translateY(-10px)" : "translateY(0)"};
-  max-height: ${(props) =>
-    props.$hide ? "0px" : "200px"}; /* Smooth collapse */
+  max-height: ${(props) => (props.$hide ? "0px" : "200px")};
   overflow: hidden;
+  width: 100%;
 `;
 
-const StyledCustomerStats = styled.div`
+const marquee = keyframes`
+  0% { 
+    transform: translateX(0);
+  }
+  100% { 
+    transform: translateX(-100%);
+  }
+`;
+
+const MarqueeWrapper = styled.div`
   display: flex;
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--color-grey-100);
   border-bottom: 1px solid var(--color-grey-200);
   box-shadow: 0 3px 8px var(--color-grey-100);
+  background-color: var(--color-grey-50);
+  margin: 0 0.8rem 0 0.8rem;
+  overflow: hidden;
+  white-space: nowrap;
+`;
+
+const MarqueeContent = styled.div`
+  display: flex;
+  animation: ${marquee} 10s linear infinite;
+
+  /* Ensure content spans full width for smooth loop */
+  min-width: 100%;
+`;
+
+const StyledCustomerStats = styled.div`
+  display: flex;
   flex-direction: row;
-  background-color: var(--color-silver-100);
   font-size: 1.4rem;
   font-weight: 600;
-  gap: 0.5rem;
-  justify-content: space-around;
-  padding: 0.5rem 1rem 0.5rem 1rem;
-  margin: 0 0.8rem 0 0.8rem;
+  gap: 2rem;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+
+  /* Duplicate content for seamless loop */
+  &::after {
+    content: attr(data-content);
+    margin-left: 2rem;
+  }
+`;
+
+const DebtItem = styled.p`
   cursor: pointer;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    color: var(--color-brand-600);
+  }
 `;
 
 const SearchInput = styled(Input)`
@@ -132,55 +211,140 @@ const CustomerStats = ({
     <>
       {customerWithHighestDebt.totalOutstandingDebt > 0 ? (
         <StatsContainer $hide={searchTerm.length > 0}>
-          <StyledCustomerStats>
-            <p
-              onClick={() =>
-                handleRowClick(customerWithHighestDebt._id, {
-                  customerName: customerWithHighestDebt.customerName,
-                  customerContact: customerWithHighestDebt.customerContact,
-                })
-              }
-            >
-              Highest Debt :{" "}
-              {capitalizeFirstLetter(customerWithHighestDebt.customerName)} (
-              {formatCurrency(customerWithHighestDebt.totalOutstandingDebt)})
-              <FaAngleRight
-                style={{
-                  color: "var(--color-brand-500)",
-                  paddingTop: "3px",
-                  fontSize: "16px",
-                }}
-              />
-            </p>
-            <p
-              onClick={() =>
-                handleRowClick(oldestCustomerWithUnpaidDebt._id, {
-                  customerName: oldestCustomerWithUnpaidDebt.customerName,
-                  customerContact: oldestCustomerWithUnpaidDebt.customerContact,
-                })
-              }
-            >
-              Oldest debt :{" "}
-              {capitalizeFirstLetter(
-                oldestCustomerWithUnpaidDebt?.customerName
-              )}
-              , not paid since{" "}
-              {years > 0
-                ? `${years} years ${months > 0 ? `${months} ${months === 1 ? "month" : "months"}` : ""} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
-                : months > 0
-                  ? `${months} ${months === 1 ? "month" : "months"} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
-                  : days === 0
-                    ? "today"
-                    : `${days} ${days === 1 ? `day` : `days`}`}{" "}
-              <FaAngleRight
-                style={{
-                  color: "var(--color-brand-500)",
-                  paddingTop: "3px",
-                  fontSize: "16px",
-                }}
-              />
-            </p>
-          </StyledCustomerStats>
+          <MarqueeWrapper>
+            <MarqueeContent>
+              <StyledCustomerStats
+                data-content={`Highest Debt: ${capitalizeFirstLetter(customerWithHighestDebt.customerName)} (${formatCurrency(customerWithHighestDebt.totalOutstandingDebt)}) • Oldest debt: ${capitalizeFirstLetter(oldestCustomerWithUnpaidDebt?.customerName)}, not paid since ${
+                  years > 0
+                    ? `${years} years ${months > 0 ? `${months} ${months === 1 ? "month" : "months"}` : ""} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
+                    : months > 0
+                      ? `${months} ${months === 1 ? "month" : "months"} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
+                      : days === 0
+                        ? "today"
+                        : `${days} ${days === 1 ? "day" : "days"}`
+                }`}
+              >
+                <DebtItem
+                  onClick={() =>
+                    handleRowClick(customerWithHighestDebt._id, {
+                      customerName: customerWithHighestDebt.customerName,
+                      customerContact: customerWithHighestDebt.customerContact,
+                    })
+                  }
+                >
+                  💰 Highest Debtor :{" "}
+                  {capitalizeFirstLetter(customerWithHighestDebt.customerName)}{" "}
+                  (
+                  {formatCurrency(customerWithHighestDebt.totalOutstandingDebt)}
+                  )
+                  <FaAngleRight
+                    style={{
+                      color: "var(--color-brand-500)",
+                      fontSize: "16px",
+                    }}
+                  />
+                </DebtItem>
+
+                <span
+                  style={{ margin: "0 1rem", color: "var(--color-grey-400)" }}
+                >
+                  •
+                </span>
+
+                <DebtItem
+                  onClick={() =>
+                    handleRowClick(oldestCustomerWithUnpaidDebt._id, {
+                      customerName: oldestCustomerWithUnpaidDebt.customerName,
+                      customerContact:
+                        oldestCustomerWithUnpaidDebt.customerContact,
+                    })
+                  }
+                >
+                  ⚠️ Oldest debtor :{" "}
+                  {capitalizeFirstLetter(
+                    oldestCustomerWithUnpaidDebt?.customerName
+                  )}
+                  , overdue since{" "}
+                  {years > 0
+                    ? `${years} years ${months > 0 ? `${months} ${months === 1 ? "month" : "months"}` : ""} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
+                    : months > 0
+                      ? `${months} ${months === 1 ? "month" : "months"} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
+                      : days === 0
+                        ? "today"
+                        : `${days} ${days === 1 ? "day" : "days"}`}
+                  <FaAngleRight
+                    style={{
+                      color: "var(--color-brand-500)",
+                      fontSize: "16px",
+                    }}
+                  />
+                </DebtItem>
+
+                {/* Duplicate content for seamless loop */}
+                <span
+                  style={{ margin: "0 1rem", color: "var(--color-grey-400)" }}
+                >
+                  •
+                </span>
+
+                <DebtItem
+                  onClick={() =>
+                    handleRowClick(customerWithHighestDebt._id, {
+                      customerName: customerWithHighestDebt.customerName,
+                      customerContact: customerWithHighestDebt.customerContact,
+                    })
+                  }
+                >
+                  Highest Debt:{" "}
+                  {capitalizeFirstLetter(customerWithHighestDebt.customerName)}{" "}
+                  (
+                  {formatCurrency(customerWithHighestDebt.totalOutstandingDebt)}
+                  )
+                  <FaAngleRight
+                    style={{
+                      color: "var(--color-brand-500)",
+                      fontSize: "16px",
+                    }}
+                  />
+                </DebtItem>
+
+                <span
+                  style={{ margin: "0 1rem", color: "var(--color-grey-400)" }}
+                >
+                  •
+                </span>
+
+                <DebtItem
+                  onClick={() =>
+                    handleRowClick(oldestCustomerWithUnpaidDebt._id, {
+                      customerName: oldestCustomerWithUnpaidDebt.customerName,
+                      customerContact:
+                        oldestCustomerWithUnpaidDebt.customerContact,
+                    })
+                  }
+                >
+                  Oldest debt:{" "}
+                  {capitalizeFirstLetter(
+                    oldestCustomerWithUnpaidDebt?.customerName
+                  )}
+                  , not paid since{" "}
+                  {years > 0
+                    ? `${years} years ${months > 0 ? `${months} ${months === 1 ? "month" : "months"}` : ""} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
+                    : months > 0
+                      ? `${months} ${months === 1 ? "month" : "months"} ${days > 0 ? `${days} ${days === 1 ? "day" : "days"}` : ""}`
+                      : days === 0
+                        ? "today"
+                        : `${days} ${days === 1 ? "day" : "days"}`}
+                  <FaAngleRight
+                    style={{
+                      color: "var(--color-brand-500)",
+                      fontSize: "16px",
+                    }}
+                  />
+                </DebtItem>
+              </StyledCustomerStats>
+            </MarqueeContent>
+          </MarqueeWrapper>
         </StatsContainer>
       ) : (
         ""

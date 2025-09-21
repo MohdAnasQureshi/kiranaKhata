@@ -4,15 +4,15 @@ import React from "react";
 const StyledLogo = styled.div`
   text-align: center;
   font-size: 2.4rem;
-  color: white;
+  color: var(--color-brand-800);
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
 `;
 
 const Img = styled.img`
-  height: 3.5rem;
+  height: 2.6rem;
   width: auto;
 `;
 

@@ -1,13 +1,10 @@
 import axios from "axios";
-import ACCESS_TOKEN from "../../constants";
 
 export async function getStockOrderLists() {
   const { data, error } = await axios.get(
     "http://192.168.1.20:8000/api/v1/shopOwners/stockOrderLists/all-stockLists",
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
   if (error) {
@@ -23,9 +20,7 @@ export async function addStockList(stockList) {
     `http://192.168.1.20:8000/api/v1/shopOwners/stockOrderLists/add-stockList`,
     stockList,
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
 
@@ -41,9 +36,7 @@ export async function editStockList(editedStockList, stockListId) {
     `http://192.168.1.20:8000/api/v1/shopOwners/stockOrderLists/edit-stockList/${stockListId}`,
     editedStockList,
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
 
@@ -58,9 +51,7 @@ export async function deleteStockList(stockListId) {
   const { data, error } = await axios.delete(
     `http://192.168.1.20:8000/api/v1/shopOwners/stockOrderLists/delete-stockList/${stockListId}`,
     {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
+      withCredentials: true,
     }
   );
 
